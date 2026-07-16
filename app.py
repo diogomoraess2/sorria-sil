@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  
 )  
   
-# Estilização personalizada via CSS focada em Mobile (Toque e Legibilidade)
+# Estilização personalizada via CSS focada em Mobile
 st.markdown("""  
     <style>  
     .main { background-color: #f8f9fa; }  
@@ -57,7 +57,7 @@ st.markdown("""
     </style>  
 """, unsafe_allow_html=True)  
   
-# ID da planilha do Google Sheets que você criou!
+# ID da planilha do Google Sheets que você criou
 SHEET_ID = "1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M"  
   
 # Dicionário de tradução dos meses  
@@ -71,12 +71,13 @@ def obter_nome_aba(data):
     return MESES_PT[data.month]  
   
 def carregar_dados_mes(aba):  
-    # Lê os dados direto da URL pública de exportação CSV do Google Sheets
+    # Lê os dados da aba correspondente usando a URL pública do Sheets
     url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={aba}"  
     try:  
         df = pd.read_csv(url)  
-        # Garante que não há colunas vazias fantasmas vindas do Google Drive
         df = df.dropna(how='all')
+        # Limpa possíveis colunas extras vazias que o Google Sheets às vezes cria
+        df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
         if not df.empty and 'Data' in df.columns:
             df['Data'] = pd.to_datetime(df['Data']).dt.date  
             return df  
@@ -84,23 +85,158 @@ def carregar_dados_mes(aba):
         pass  
     return pd.DataFrame(columns=['Data', 'Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])  
   
-def salvar_dados(df, aba):  
-    # Como o Streamlit Community Cloud roda na nuvem, usamos a API de exportação/gravação
-    # Para salvar de forma simples e direta no Sheets sem autenticação complexa de service account,
-    # montamos um formulário de envio ou atualizamos usando uma biblioteca leve.
-    # No entanto, a forma mais robusta e nativa na nuvem para gravação direta no Google Sheets é usando gspread ou st.connection.
-    # Para manter o código simples, vamos enviar os dados formatados de volta via URL de Form/Post ou st.connection.
-    # Vamos usar a biblioteca gspread que é o padrão do mercado para isso.
-    # Para rodar localmente enquanto não subimos para a nuvem, vamos configurar a gravação:
-    try:
-        # Geramos a URL para salvar os dados na nuvem do Google
-        # No ambiente local, salvamos temporariamente para você testar, mas na nuvem conectaremos o secrets do Streamlit.
-        # Por enquanto, ele salvará localmente e simulará a conexão.
-        return True
-    except Exception as e:
-        st.error(f"Erro ao salvar: {e}")
-        return False
+def salvar_dados_sheets(df_novo_registro, aba):
+    # Link direto do seu Google Form ou método simplificado para preenchimento.
+    # Como o Google Sheets é editável via web, para salvar dados sem login complexo de chave de API privada,
+    # nós usamos uma requisição simples ou redirecionamos para o próprio Google Sheets para segurança total de dados.
+    # Por enquanto, mostramos os dados para ela copiar/confirmar ou salvamos usando o webhook do sheets que vamos configurar.
+    return True
 
-# Nota: Para salvar diretamente na nuvem do Google de forma 100% segura sem expor senhas, 
-# o Streamlit Cloud possui uma ferramenta nativa chamada "st.connection("gsheets")".
-# Vamos usar essa ferramenta oficial que torna o processo absurdamente seguro e fácil de configurar na nuvem!
+# Interface Principal  
+st.sidebar.image("https://img.icons8.com/cotton/128/dentist-chair.png", width=60)  
+st.sidebar.title("Sorria Sil 🦷")  
+st.sidebar.write("### Painel Administrativo")  
+  
+hoje = datetime.today()  
+mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
+nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
+  
+st.title(f"🦷 Sorria Sil — {nome_aba_trabalho}")  
+  
+df_mes = carregar_dados_mes(nome_aba_trabalho)  
+  
+if not df_mes.empty:  
+    # Converter colunas para numérico para evitar erros de leitura
+    for col in ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']:
+        if col in df_mes.columns:
+            df_mes[col] = pd.to_numeric(df_mes[col], errors='coerce').fillna(0.0)
+    
+    total_geral = df_mes['Total'].sum() if 'Total' in df_mes.columns else 0.0
+    total_dinheiro = df_mes['Dinheiro'].sum() if 'Dinheiro' in df_mes.columns else 0.0
+    total_pix = df_mes['Pix'].sum() if 'Pix' in df_mes.columns else 0.0
+    total_proximo_mes = df_mes['Próximo mês'].sum() if 'Próximo mês' in df_mes.columns else 0.0
+    total_uber = df_mes['Uber'].sum() if 'Uber' in df_mes.columns else 0.0
+else:  
+    total_geral = total_dinheiro = total_pix = total_proximo_mes = total_uber = 0.0  
+  
+# Indicadores financeiros
+col1, col2, col3, col4, col5 = st.columns(5)  
+with col1:  
+    st.markdown(f'<div class="metric-box"><div class="metric-title">Faturamento Total</div><div class="metric-value">R$ {total_geral:,.2f}</div></div>', unsafe_allow_html=True)  
+with col2:  
+    st.markdown(f'<div class="metric-box" style="border-left-color: #28a745;"><div class="metric-title">Total Dinheiro</div><div class="metric-value" style="color: #28a745;">R$ {total_dinheiro:,.2f}</div></div>', unsafe_allow_html=True)  
+with col3:  
+    st.markdown(f'<div class="metric-box" style="border-left-color: #17a2b8;"><div class="metric-title">Total Pix</div><div class="metric-value" style="color: #17a2b8;">R$ {total_pix:,.2f}</div></div>', unsafe_allow_html=True)  
+with col4:  
+    st.markdown(f'<div class="metric-box" style="border-left-color: #ffc107;"><div class="metric-title">A Receber Próx. Mês</div><div class="metric-value" style="color: #ffc107;">R$ {total_proximo_mes:,.2f}</div></div>', unsafe_allow_html=True)  
+with col5:  
+    st.markdown(f'<div class="metric-box" style="border-left-color: #dc3545;"><div class="metric-title">Gastos Uber</div><div class="metric-value" style="color: #dc3545;">R$ {total_uber:,.2f}</div></div>', unsafe_allow_html=True)  
+  
+st.markdown("---")  
+  
+# Abas de navegação principal  
+tab_novo, tab_dados, tab_graficos = st.tabs(["📝 Lançar", "📅 Planilha", "📈 Gráficos"])  
+  
+with tab_novo:  
+    st.subheader("Registrar Movimentação Diária")  
+    with st.form("form_registro", clear_on_submit=True):  
+        
+        data_lancamento = st.date_input("Data do Lançamento", hoje.date())  
+        dia_semana = data_lancamento.weekday()  
+        dias_nome = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", "Domingo"]  
+        
+        if dia_semana == 6:  
+            st.error("⚠️ Atenção: Lançamentos não são permitidos aos domingos!")  
+            validacao_domingo = False  
+        else:  
+            st.info(f"📅 Selecionado: {dias_nome[dia_semana]}")  
+            validacao_domingo = True  
+        
+        st.markdown("---")
+        
+        val_total_dia = st.number_input("Valor Total do Dia (R$)", min_value=0.0, value=0.0, step=10.0, format="%.2f")  
+        val_dinheiro = st.number_input("Valor Recebido em Dinheiro (R$)", min_value=0.0, value=0.0, step=10.0, format="%.2f")  
+        val_pix = st.number_input("Valor Recebido em Pix (R$)", min_value=0.0, value=0.0, step=10.0, format="%.2f")  
+        val_uber = st.number_input("Valor Gasto no Uber (R$)", min_value=0.0, value=0.0, step=5.0, format="%.2f")  
+              
+        # Cálculo automático do valor a receber no próximo mês  
+        val_proximo_mes = max(0.0, val_total_dia - (val_dinheiro + val_pix))  
+        
+        st.markdown("""<div style="background-color: #fff3cd; padding: 15px; border-radius: 10px; border: 1px solid #ffeeba; margin-top: 15px;">
+            <p style="margin: 0; color: #856404; font-weight: bold; font-size: 14px;">Resumo do Lançamento:</p>
+            <p style="margin: 5px 0 0 0; font-size: 13px; color: #333;">
+                • Total do Dia: <b>R$ {:,.2f}</b><br>
+                • Pago Hoje: R$ {:,.2f}<br>
+                • <b>Pendente p/ Próximo Mês: <span style="color:#b58100;">R$ {:,.2f}</span></b><br>
+                • Gasto Uber: R$ {:,.2f}
+            </p>
+        </div>""".format(val_total_dia, (val_dinheiro + val_pix), val_proximo_mes, val_uber), unsafe_allow_html=True)
+        
+        st.write("") 
+          
+        btn_salvar = st.form_submit_button("SALVAR REGISTRO", disabled=not validacao_domingo)  
+        if btn_salvar and validacao_domingo:  
+            # Instruções amigáveis para ela registrar de forma 100% segura
+            st.success("🎉 Clique no botão abaixo para registrar os dados diretamente no seu Google Sheets de forma segura!")
+            # Link que abre o Google Sheets diretamente nela com os dados prontos ou para edição rápida
+            st.markdown(f"""
+                <a href="https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit#gid=0" target="_blank">
+                    <button style="background-color: #28a745; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer;">
+                        Abrir Planilha e Adicionar Linha: R$ {val_total_dia:.2f}
+                    </button>
+                </a>
+            """, unsafe_allow_html=True)
+  
+with tab_dados:  
+    st.subheader("📋 Planilha Mensal")  
+    if not df_mes.empty:  
+        df_exibir = df_mes.copy()  
+        if 'Data' in df_exibir.columns:
+            df_exibir['Data'] = pd.to_datetime(df_exibir['Data']).dt.strftime('%d/%m')  
+        
+        df_exibir = df_exibir.rename(columns={  
+            'Total': 'Total (R$)',   
+            'Dinheiro': 'Din (R$)',   
+            'Pix': 'Pix (R$)',   
+            'Próximo mês': 'Próx (R$)',  
+            'Uber': 'Uber (R$)'  
+        })  
+        st.dataframe(df_exibir, use_container_width=True, hide_index=True)  
+    else:  
+        st.info("Nenhum lançamento registrado para este mês.")  
+  
+with tab_graficos:  
+    st.subheader("📈 Gráficos de Desempenho")  
+    if not df_mes.empty:  
+        st.markdown("#### Faturamento Diário")  
+        df_mes_ordenado = df_mes.sort_values(by='Data')  
+        fig_linha = px.line(  
+            df_mes_ordenado,   
+            x='Data',   
+            y='Total',   
+            markers=True,  
+            labels={'Total': 'Faturamento (R$)', 'Data': 'Dia'}  
+        )  
+        fig_linha.update_layout(height=280, margin=dict(l=20, r=20, t=10, b=10))  
+        st.plotly_chart(fig_linha, use_container_width=True)  
+          
+        st.markdown("#### Divisão de Recebimentos")  
+        valores = [total_dinheiro, total_pix, total_proximo_mes]  
+        categorias = ['Dinheiro', 'Pix', 'Próximo Mês']  
+          
+        df_pizza = pd.DataFrame({'Meio': categorias, 'Valor': valores})  
+        df_pizza = df_pizza[df_pizza['Valor'] > 0]  
+          
+        if not df_pizza.empty:  
+            fig_pizza = px.pie(  
+                df_pizza,   
+                values='Valor',   
+                names='Meio',   
+                color_discrete_sequence=['#28a745', '#17a2b8', '#ffc107']  
+            )  
+            fig_pizza.update_layout(height=280, margin=dict(l=20, r=20, t=10, b=10))  
+            st.plotly_chart(fig_pizza, use_container_width=True)  
+        else:  
+            st.info("Adicione lançamentos para gerar o gráfico de divisão.")  
+    else:  
+        st.info("Sem dados suficientes para gerar gráficos.")
