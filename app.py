@@ -105,7 +105,7 @@ nome_aba_trabalho = MESES_PT[mes_selecionado_num]
 st.markdown(
     f"""
     <h1 style="
-        font-size: clamp(20px, 5.5vw, 40px); 
+        font-size: clamp(30px, 5.5vw, 50px); 
         white-space: nowrap; 
         overflow: hidden; 
         text-overflow: ellipsis;
