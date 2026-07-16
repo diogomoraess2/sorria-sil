@@ -101,7 +101,21 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-st.title(f"🦷 Sorria Sil — {nome_aba_trabalho}")  
+# Título responsivo que se ajusta ao tamanho da tela do celular para caber sempre em uma linha só
+st.markdown(
+    f"""
+    <h1 style="
+        font-size: clamp(20px, 5.5vw, 40px); 
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis;
+        margin-bottom: 15px;
+    ">
+        🦷 Sorria Sil <span style="color: #6c757d; font-weight: 300;">|</span> {nome_aba_trabalho}
+    </h1>
+    """, 
+    unsafe_allow_html=True
+)  
   
 df_mes = carregar_dados_mes(nome_aba_trabalho)  
   
