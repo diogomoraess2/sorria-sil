@@ -152,7 +152,7 @@ st.markdown("---")
 tab_novo, tab_dados, tab_graficos = st.tabs(["📝 Lançar", "📅 Planilha", "📈 Gráficos"])  
   
 with tab_novo:  
-    st.subheader("Registrar Movimentação Diária")  
+    st.subheader("Registrar Diária")  
     with st.form("form_registro", clear_on_submit=True):  
         
         data_lancamento = st.date_input("Data do Lançamento", hoje.date())  
