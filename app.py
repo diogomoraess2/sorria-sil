@@ -17,7 +17,7 @@ st.set_page_config(
 st.markdown("""  
     <style>  
     .metric-box { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; margin-bottom: 10px; border-left: 6px solid; }  
-    .metric-title { font-size: 11px; color: #6c757d; font-weight: bold; text-transform: uppercase; }  
+    .metric-title { font-size: 11px; font-weight: bold; text-transform: uppercase; }  
     .metric-value { font-size: 20px; color: #212529; font-weight: bold; }  
     .mes-neon { font-weight: 700; font-size: 28px; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00e6ff, 0 0 30px #00e6ff; color: #ffffff; }  
     </style>  
@@ -98,6 +98,7 @@ else:
 # Mapeamento de cores
 cores = {'Total': '#007bff', 'Dinheiro': '#636EFA', 'Pix': '#FBBC05', 'A Receber': '#25D366', 'Uber': '#EA4335'}
 
+# --- MÉTRICAS COM CORES NO TÍTULO E NA BORDA ---
 cols = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
 for i, (titulo, col) in enumerate(metricas):
@@ -105,14 +106,14 @@ for i, (titulo, col) in enumerate(metricas):
     with cols[i]:
         st.markdown(f'''
             <div class="metric-box" style="border-left-color: {cor_lateral};">
-                <div class="metric-title">{titulo}</div>
+                <div class="metric-title" style="color: {cor_lateral};">{titulo}</div>
                 <div class="metric-value">R$ {totais[col]:,.2f}</div>
             </div>
         ''', unsafe_allow_html=True)
 
 st.markdown("---")
 
-# --- ABAS CORRIGIDAS ---
+# --- ABAS ---
 tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 
 with tab1:
