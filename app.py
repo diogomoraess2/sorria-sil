@@ -168,30 +168,63 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# --- TÍTULO RESPONSIVO: VERSÃO CORRIGIDA PARA RENDERIZAÇÃO ---
+# --- TÍTULO RESPONSIVO: MÊS COM EFEITO NEON BRANCO ---
 st.markdown(
     f"""
     <style>
-    .container-titulo {{ display: flex; flex-direction: column; }}
-    .linha-superior {{ display: flex; align-items: center; }}
-    .emoji-dente {{ font-size: 2.5em; margin-right: 15px; line-height: 1; }}
+    .container-titulo {{
+        display: flex;
+        align-items: baseline; 
+        white-space: nowrap;
+        margin-bottom: 15px;
+    }}
+    .titulo-principal {{
+        font-size: 42px;
+        font-weight: bold;
+        margin: 0;
+        display: flex;
+        align-items: baseline; 
+    }}
+    .emoji-dente {{
+        font-size: 2.5em;      
+        margin-right: 15px;
+        line-height: 1;
+    }}
     .mes-neon {{
-        font-size: 1.5em;
+        font-size: 0.55em;
         font-weight: 300;
-        color: #ffffff;
+        color: #ffffff; /* Cor branca principal */
+        margin-left: 10px;
+        vertical-align: 4px;
+        /* Efeito Neon: sombras múltiplas criam o brilho */
         text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00e6ff, 0 0 30px #00e6ff;
+    }}
+    
+    /* Ajuste responsivo para Celulares */
+    @media (max-width: 600px) {{
+        .container-titulo {{
+            margin-left: -5px;
+        }}
+        .titulo-principal {{
+            font-size: 5.6vw; 
+        }}
+        .emoji-dente {{
+            font-size: 2.2em; 
+            margin-right: 8px;
+        }}
+        .mes-neon {{
+            vertical-align: 3px;
+        }}
     }}
     </style>
     
     <div class="container-titulo">
-        <div class="linha-superior">
-            <span class="emoji-dente">🦷</span>
-            <h1 style="margin: 0; font-size: 42px;">Sorria Sil</h1>
-        </div>
-        <div style="margin-top: 5px;">
-            <span style="font-weight: 300; color: #ffffff;">|</span> 
+        <span class="emoji-dente">🦷</span>
+        <h1 class="titulo-principal">
+            Sorria Sil 
+            <span style="font-weight: 300; font-size: 0.7em; margin-left: 10px; vertical-align: 4px; color: #ffffff;">|</span> 
             <span class="mes-neon">{nome_aba_trabalho}</span>
-        </div>
+        </h1>
     </div>
     """, 
     unsafe_allow_html=True
