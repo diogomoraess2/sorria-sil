@@ -168,39 +168,48 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# --- TÍTULO RESPONSIVO: PROPORÇÕES OTIMIZADAS PARA UMA LINHA ---
+# --- TÍTULO RESPONSIVO: EMOJI EM DESTAQUE E MÊS OTIMIZADO ---
 st.markdown(
     f"""
     <style>
     .container-titulo {{
         display: flex;
-        align-items: center; /* Centraliza tudo verticalmente na linha */
-        white-space: nowrap; /* Trava tudo em uma linha só */
+        align-items: center; 
+        white-space: nowrap;
         margin-bottom: 15px;
+        overflow: hidden; /* Garante que nada transborde */
     }}
     .titulo-principal {{
         font-size: 42px;
         font-weight: bold;
         margin: 0;
+        display: flex;
+        align-items: center;
+    }}
+    .emoji-dente {{
+        font-size: 1.5em; /* Dente maior (1.5x a altura da fonte principal) */
+        margin-right: 12px;
+        line-height: 1;
     }}
     .mes-reduzido {{
-        font-size: 0.75em; /* Nome do mês menor que o título principal */
+        font-size: 0.65em; /* Nome do mês ainda mais compacto para garantir que não corte */
         font-weight: 300;
         color: #6c757d;
         margin-left: 8px;
+        align-self: center;
     }}
     
     /* Ajuste responsivo para Celulares */
     @media (max-width: 600px) {{
         .container-titulo {{
-            margin-left: -10px;
+            margin-left: -5px;
         }}
         .titulo-principal {{
-            font-size: 6.2vw; /* Ajustado para caber todo o conteúdo em uma linha */
+            font-size: 6.0vw; /* Calibrado para o limite máximo da tela */
         }}
         .emoji-dente {{
-            font-size: 1em; /* Tamanho proporcional à frase Sorria Sil */
-            margin-right: 6px;
+            font-size: 1.5em; /* Mantém o dente grande mas proporcional */
+            margin-right: 8px;
         }}
     }}
     </style>
@@ -208,14 +217,14 @@ st.markdown(
     <div class="container-titulo">
         <span class="emoji-dente">🦷</span>
         <h1 class="titulo-principal">
-            Sorria Sil <span style="font-weight: 300;">|</span> 
+            Sorria Sil <span style="font-weight: 300; font-size: 0.8em; margin: 0 5px;">|</span> 
             <span class="mes-reduzido">{nome_aba_trabalho}</span>
         </h1>
     </div>
     """, 
     unsafe_allow_html=True
 )
-# ---------------------------------------------------------------------------  
+# -----------------------------------------------------------  
   
 df_mes = carregar_dados_mes(nome_aba_trabalho)  
   
