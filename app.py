@@ -64,9 +64,9 @@ try:
         # Criamos um dicionário com as credenciais cadastradas nos Secrets
         creds_dict = dict(st.secrets["connections"]["gsheets"])
         
-        # Puxamos a chave privada e limpamos espaços invisíveis ou quebras de linha corrompidas[cite: 2]
+        # Puxamos a chave privada e limpamos espaços invisíveis ou quebras de linha corrompidas
         chave_crua = creds_dict.get("private_key", "")
-        chave_corrigida = chave_crua.replace("\\n", "\n").strip()[cite: 2]
+        chave_corrigida = chave_crua.replace("\\n", "\n").strip()
         
         # Criamos um dicionário contendo APENAS os parâmetros aceitos pela conexão do GSheets
         # Isso evita que parâmetros extras como 'project_id' quebrem o conector
@@ -78,12 +78,12 @@ try:
         # Iniciamos a conexão passando apenas as variáveis estritamente necessárias
         conn = st.connection("gsheets", type=GSheetsConnection, **dados_conexao_filtrados)
     else:
-        # Se por algum motivo as credenciais não estiverem cadastradas, tenta o padrão do Streamlit[cite: 2]
-        conn = st.connection("gsheets", type=GSheetsConnection)[cite: 2]
+        # Se por algum motivo as credenciais não estiverem cadastradas, tenta o padrão do Streamlit
+        conn = st.connection("gsheets", type=GSheetsConnection)
 except Exception as e:
-    st.error(f"Erro ao conectar ao Google Sheets: {e}")[cite: 2]
-    st.info("Por favor, verifique se as credenciais na aba 'Secrets' do Streamlit Cloud estão salvas corretamente.")[cite: 2]
-    st.stop()  # Interrompe o script de forma amigável para exibir o erro ao usuário[cite: 2]
+    st.error(f"Erro ao conectar ao Google Sheets: {e}")
+    st.info("Por favor, verifique se as credenciais na aba 'Secrets' do Streamlit Cloud estão salvas corretamente.")
+    st.stop()  # Interrompe o script de forma amigável para exibir o erro ao usuário
 # ----------------------------------------
   
 # URL oficial de compartilhamento da sua planilha do Google Sheets
