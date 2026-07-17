@@ -61,18 +61,20 @@ st.markdown("""
 # --- TRATAMENTO ROBUSTO DE CREDENCIAIS ---
 try:
     if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
-        # Acessamos diretamente o dicionário do Streamlit Secrets na memória
-        secrets_gsheets = st.secrets["connections"]["gsheets"]
+        # Criamos um dicionário comum na memória (que aceita alterações) copiando os dados dos Secrets
+        creds_dict = dict(st.secrets["connections"]["gsheets"])
         
-        # Se a chave privada existir, corrigimos as quebras de linha direto no objeto de secrets
-        if "private_key" in secrets_gsheets:
-            chave_crua = secrets_gsheets["private_key"]
-            # Sobrescrevemos o valor no segredo do Streamlit com a formatação correta
-            secrets_gsheets["private_key"] = chave_crua.replace("\\n", "\n").strip()
-
-    # Chamamos a conexão padrão. Como corrigimos o st.secrets acima, 
-    # o Streamlit vai ler a chave corrigida automaticamente sem reclamar de parâmetros inesperados!
-    conn = st.connection("gsheets", type=GSheetsConnection)
+        # Corrigimos as quebras de linha da chave privada dentro dessa cópia editável
+        if "private_key" in creds_dict:
+            chave_crua = creds_dict["private_key"]
+            creds_dict["private_key"] = chave_crua.replace("\\n", "\n").strip()
+        
+        # O conector do GSheets aceita receber todo o dicionário de credenciais formatado
+        # através de um argumento especial chamado 'credentials'
+        conn = st.connection("gsheets", type=GSheetsConnection, credentials=creds_dict)
+    else:
+        # Fallback padrão caso não existam as credenciais estruturadas
+        conn = st.connection("gsheets", type=GSheetsConnection)
 
 except Exception as e:
     st.error(f"Erro ao conectar ao Google Sheets: {e}")
