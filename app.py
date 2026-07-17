@@ -59,13 +59,12 @@ st.markdown("""
 """, unsafe_allow_html=True)  
 
 # --- TRATAMENTO ROBUSTO DE CREDENCIAIS ---
-conexao_configurada = False
 try:
     if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
-        # Criamos um dicionário com as credenciais cadastradas nos Secrets
+        # Criamos um dicionário limpo com as credenciais cadastradas nos Secrets
         creds_dict = dict(st.secrets["connections"]["gsheets"])
         
-        # REMOVE O "type" DO DICIONÁRIO PARA EVITAR DUPLICIDADE COM GSheetsConnection
+        # Remove "type" para não conflitar com o parâmetro 'type=GSheetsConnection'
         creds_dict.pop("type", None)
         
         # Puxamos a chave privada e limpamos espaços invisíveis ou quebras de linha corrompidas
@@ -75,15 +74,15 @@ try:
         chave_corrigida = chave_crua.replace("\\n", "\n").strip()
         creds_dict["private_key"] = chave_corrigida
         
-        # Iniciamos a conexão passando os parâmetros limpos manualmente
+        # Conexão principal e única
         conn = st.connection("gsheets", type=GSheetsConnection, **creds_dict)
-        conexao_configurada = True
+    else:
+        # Se por algum motivo as credenciais não estiverem cadastradas, tenta o padrão do Streamlit
+        conn = st.connection("gsheets", type=GSheetsConnection)
 except Exception as e:
-    st.sidebar.warning(f"Aviso na preparação das credenciais: {e}")
-
-# Caso o tratamento manual acima falhe, tenta o método padrão como plano B
-if not conexao_configurada:
-    conn = st.connection("gsheets", type=GSheetsConnection)
+    st.error(f"Erro ao conectar ao Google Sheets: {e}")
+    st.info("Por favor, verifique se as credenciais na aba 'Secrets' do Streamlit Cloud estão salvas corretamente.")
+    st.stop()  # Interrompe o script de forma amigável para exibir o erro ao usuário
 # ----------------------------------------
   
 # URL oficial de compartilhamento da sua planilha do Google Sheets
