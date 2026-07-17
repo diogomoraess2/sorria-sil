@@ -133,10 +133,28 @@ with tab2:
 with tab3:
     st.subheader("Análise Financeira")
     if not df_mes.empty:
-        # Gráfico de Pizza (incluindo o Próximo mês)
+        # Preparação dos dados para o gráfico de pizza
         dados_pizza = {'Categoria': ['Dinheiro', 'Pix', 'Uber', 'A Receber'], 
                        'Valores': [totais['Dinheiro'], totais['Pix'], totais['Uber'], totais['Próximo mês']]}
-        fig_pizza = px.pie(pd.DataFrame(dados_pizza), values='Valores', names='Categoria', title="Distribuição do Total")
+        df_pizza = pd.DataFrame(dados_pizza)
+        
+        # Mapeamento de cores (verde WhatsApp para 'A Receber')
+        cores = {
+            'Dinheiro': '#636EFA', 
+            'Pix': '#EF553B', 
+            'Uber': '#00CC96', 
+            'A Receber': '#25D366'
+        }
+        
+        # Gráfico de Pizza
+        fig_pizza = px.pie(
+            df_pizza, 
+            values='Valores', 
+            names='Categoria', 
+            title="Distribuição do Total",
+            color='Categoria',
+            color_discrete_map=cores
+        )
         st.plotly_chart(fig_pizza, use_container_width=True)
         
         # Gráfico de Evolução (Linha)
