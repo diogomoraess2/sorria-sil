@@ -168,14 +168,14 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# --- TÍTULO RESPONSIVO: ALINHAMENTO CENTRAL VERTICAL TOTAL ---
+# --- TÍTULO RESPONSIVO: ALINHAMENTO VERTICAL CENTRAL E LINHA ÚNICA ---
 st.markdown(
     f"""
     <style>
     .container-titulo {{
         display: flex;
-        align-items: center; 
-        white-space: nowrap;
+        align-items: center; /* Centraliza verticalmente o dente e o texto */
+        white-space: nowrap; /* Impede a quebra de linha de qualquer forma */
         margin-bottom: 15px;
         overflow: hidden;
     }}
@@ -184,16 +184,18 @@ st.markdown(
         font-weight: bold;
         margin: 0;
         display: flex;
-        align-items: center; /* Garante alinhamento central */
+        align-items: center; /* Centraliza pipeline e mês com o texto */
     }}
     .emoji-dente {{
-        font-size: 2.5em; 
+        font-size: 2.5em; /* Dente imponente */
         margin-right: 15px;
-        line-height: 0.8;
+        line-height: 1;
+        display: flex;
+        align-items: center;
     }}
     .bloco-extra {{
         display: flex;
-        align-items: center; /* Centraliza o pipeline e o mês verticalmente */
+        align-items: center; /* Mantém pipeline e mês alinhados */
         margin-left: 10px;
     }}
     .mes-reduzido {{
@@ -209,7 +211,7 @@ st.markdown(
             margin-left: -5px;
         }}
         .titulo-principal {{
-            font-size: 5.6vw; 
+            font-size: 5.6vw; /* Escala inteligente para não quebrar linha */
         }}
         .emoji-dente {{
             font-size: 2.2em; 
