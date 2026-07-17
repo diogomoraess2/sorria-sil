@@ -140,7 +140,8 @@ def carregar_dados_mes(aba):
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
         
         if not df.empty and 'Data' in df.columns:
-            df['Data'] = pd.to_datetime(df['Data'], errors='coerce').dt.date  
+            # Forçamos o Python a ler a data no formato brasileiro Dia/Mês/Ano (dayfirst=True)
+            df['Data'] = pd.to_datetime(df['Data'], dayfirst=True, errors='coerce').dt.date  
             df = df.dropna(subset=['Data'])
             return df  
     except Exception as e:  
