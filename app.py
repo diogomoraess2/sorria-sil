@@ -57,6 +57,18 @@ st.markdown("""
     }  
     </style>  
 """, unsafe_allow_html=True)  
+
+# --- TRATAMENTO CRÍTICO DE CREDENCIAIS ---
+# Força a conversão de '\\n' para quebras de linha reais na memória do Streamlit
+# Isso evita o bug de leitura de chaves privadas PEM no Linux do Streamlit Cloud
+try:
+    if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
+        pk = st.secrets["connections"]["gsheets"]["private_key"]
+        # Substitui os caracteres literais '\n' por quebras de linha verdadeiras
+        st.secrets["connections"]["gsheets"]["private_key"] = pk.replace("\\n", "\n")
+except Exception as e:
+    pass
+# ----------------------------------------
   
 # URL oficial de compartilhamento da sua planilha do Google Sheets
 URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M/edit?usp=sharing"  
@@ -68,7 +80,7 @@ MESES_PT = {
     9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'  
 }  
   
-# Estabelece a conexão usando as credenciais do secrets.toml
+# Estabelece a conexão usando as credenciais corrigidas dinamicamente
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 def obter_nome_aba(data):  
@@ -77,16 +89,13 @@ def obter_nome_aba(data):
 def carregar_dados_mes(aba):  
     try:  
         # Lê os dados da aba correspondente usando a API oficial do GSheets
-        # ttl="0" garante que sempre trará os dados atualizados em tempo real
         df = conn.read(spreadsheet=URL_PLANILHA, sheet=aba, ttl="0")  
         df = df.dropna(how='all')
-        # Limpa possíveis colunas extras vazias
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
         
         if not df.empty and 'Data' in df.columns:
-            # Garante que a coluna de data esteja formatada corretamente
             df['Data'] = pd.to_datetime(df['Data'], errors='coerce').dt.date  
-            df = df.dropna(subset=['Data']) # Remove linhas sem data válida
+            df = df.dropna(subset=['Data'])
             return df  
     except Exception as e:  
         st.sidebar.error(f"Erro ao carregar a aba '{aba}': {e}")
@@ -95,13 +104,8 @@ def carregar_dados_mes(aba):
   
 def salvar_dados_sheets(df_novo_registro, aba):
     try:
-        # Carrega os dados que já existem na planilha para não sobrescrever nada
         df_existente = carregar_dados_mes(aba)
-        
-        # Junta os dados antigos com o novo lançamento
         df_atualizado = pd.concat([df_existente, df_novo_registro], ignore_index=True)
-        
-        # Atualiza a planilha no Google Sheets diretamente na aba correspondente
         conn.update(spreadsheet=URL_PLANILHA, sheet=aba, data=df_atualizado)
         return True
     except Exception as e:
@@ -117,7 +121,6 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# Título responsivo que se ajusta ao tamanho da tela do celular
 st.markdown(
     f"""
     <h1 style="
@@ -136,7 +139,6 @@ st.markdown(
 df_mes = carregar_dados_mes(nome_aba_trabalho)  
   
 if not df_mes.empty:  
-    # Converter colunas para numérico para evitar erros de cálculo
     for col in ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']:
         if col in df_mes.columns:
             df_mes[col] = pd.to_numeric(df_mes[col], errors='coerce').fillna(0.0)
@@ -189,7 +191,6 @@ with tab_novo:
         val_pix = st.number_input("Valor Recebido em Pix (R$)", min_value=0.0, value=0.0, step=10.0, format="%.2f")  
         val_uber = st.number_input("Valor Gasto no Uber (R$)", min_value=0.0, value=0.0, step=5.0, format="%.2f")  
                 
-        # Cálculo automático do valor a receber no próximo mês  
         val_proximo_mes = max(0.0, val_total_dia - (val_dinheiro + val_pix))  
           
         st.markdown("""<div style="background-color: #fff3cd; padding: 15px; border-radius: 10px; border: 1px solid #ffeeba; margin-top: 15px;">
@@ -207,7 +208,6 @@ with tab_novo:
         btn_salvar = st.form_submit_button("SALVAR REGISTRO", disabled=not validacao_domingo)  
         
         if btn_salvar and validacao_domingo:  
-            # Cria o DataFrame com a nova linha de dados
             novo_df = pd.DataFrame([{
                 'Data': data_lancamento.strftime('%Y-%m-%d'), 
                 'Total': val_total_dia,
@@ -217,7 +217,6 @@ with tab_novo:
                 'Uber': val_uber
             }])
             
-            # Obtém o nome da aba correspondente à data escolhida no formulário
             aba_destino = obter_nome_aba(data_lancamento)
             
             with st.spinner("Enviando dados de forma segura para o Google Sheets..."):
@@ -225,7 +224,6 @@ with tab_novo:
                 
             if sucesso:
                 st.success(f"🎉 Registro de R$ {val_total_dia:.2f} adicionado com sucesso em '{aba_destino}'!")
-                # Atualiza a página para mostrar os dados atualizados nos cards e gráficos
                 st.rerun()
             else:
                 st.error("❌ Ocorreu um problema ao tentar registrar o dado. Verifique as credenciais.")
