@@ -64,7 +64,7 @@ if 'editando_mes' not in st.session_state: st.session_state['editando_mes'] = Fa
 
 st.markdown("<h1>🦷 Sorria Sil</h1>", unsafe_allow_html=True)
 
-st.markdown("### Mês:")
+# Texto "Mês" removido conforme solicitado
 st.markdown(f'<span class="mes-neon">{MESES_PT[st.session_state["mes_atual_num"]]}</span>', unsafe_allow_html=True)
 
 # Lógica de seleção
@@ -95,7 +95,7 @@ if not df_mes.empty:
 else:
     totais = pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
-# Mapeamento de cores (INVERTIDO: Dinheiro agora é verde, A Receber agora é azul claro)
+# Mapeamento de cores (Dinheiro = Verde, A Receber = Azul)
 cores = {'Total': '#007bff', 'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'A Receber': '#636EFA', 'Uber': '#EA4335'}
 
 # --- MÉTRICAS COM CORES NO TÍTULO E NA BORDA ---
@@ -135,7 +135,7 @@ with tab3:
         dados_pizza = {'Categoria': ['Dinheiro', 'Pix', 'Uber', 'A Receber'], 
                        'Valores': [totais['Dinheiro'], totais['Pix'], totais['Uber'], totais['Próximo mês']]}
         df_pizza = pd.DataFrame(dados_pizza)
-        # Mapeamento de cores para o gráfico (INVERTIDO)
+        # Mapeamento de cores para o gráfico
         cores_pizza = {'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'Uber': '#EA4335', 'A Receber': '#636EFA'}
         fig_pizza = px.pie(df_pizza, values='Valores', names='Categoria', title="Distribuição do Total", color='Categoria', color_discrete_map=cores_pizza)
         st.plotly_chart(fig_pizza, use_container_width=True)
