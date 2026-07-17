@@ -53,7 +53,7 @@ st.markdown("""
         .mes-neon { 
             color: #8A2BE2 !important; 
             /* Brilho ajustado para lilás para não "branquear" o texto */
-            text-shadow: 0 0 5px #8A2BE2, 0 0 10px #8A2BE2, 0 0 20px #8A2BE2 !important; 
+            text-shadow: 0 0 5px #8e05f5, 0 0 10px #8e05f5, 0 0 20px #8A2BE2 !important; 
         }
     }
     
