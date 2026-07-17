@@ -3,6 +3,8 @@ import pandas as pd
 from datetime import datetime  
 import plotly.express as px  
 from streamlit_gsheets import GSheetsConnection  
+from google.oauth2.service_account import Credentials
+import gspread
 
 # Configuração da página do Streamlit otimizada para Celular
 st.set_page_config(  
@@ -58,33 +60,60 @@ st.markdown("""
     </style>  
 """, unsafe_allow_html=True)  
 
-# --- TRATAMENTO ROBUSTO DE CREDENCIAIS ---
+# --- CONEXÃO ROBUSTA E DIRETA COM GOOGLE SHEETS ---
+class ConexaoManualSheets:
+    """Classe simulada para manter a compatibilidade com o restante do seu código (.read e .update)"""
+    def __init__(self, client):
+        self.client = client
+
+    def read(self, spreadsheet, sheet, ttl=None):
+        # Abre a planilha pela URL e lê todos os registros como DataFrame
+        sh = self.client.open_by_url(spreadsheet)
+        worksheet = sh.worksheet(sheet)
+        dados = worksheet.get_all_records()
+        return pd.DataFrame(dados)
+
+    def update(self, spreadsheet, sheet, data):
+        # Abre a planilha pela URL e substitui os dados da aba selecionada
+        sh = self.client.open_by_url(spreadsheet)
+        worksheet = sh.worksheet(sheet)
+        worksheet.clear()
+        # Envia o cabeçalho e as linhas atualizadas
+        worksheet.update([data.columns.values.tolist()] + data.values.tolist())
+
 try:
     if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
-        # Criamos um dicionário comum na memória copiando os dados dos Secrets
+        # Criamos o dicionário de credenciais na memória
         creds_dict = dict(st.secrets["connections"]["gsheets"])
         
-        # Corrigimos as quebras de linha da chave privada dentro dessa cópia editável
+        # Corrigimos as quebras de linha da chave privada
         if "private_key" in creds_dict:
             chave_crua = creds_dict["private_key"]
             creds_dict["private_key"] = chave_crua.replace("\\n", "\n").strip()
         
-        # O argumento correto para injetar o dicionário de credenciais corrigido 
-        # na biblioteca streamlit-gsheets é 'gspread_client_or_credentials_dict'
-        conn = st.connection(
-            "gsheets", 
-            type=GSheetsConnection, 
-            gspread_client_or_credentials_dict=creds_dict
-        )
+        # Escopos necessários para ler e escrever no Google Drive / Google Sheets
+        escopos = [
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive"
+        ]
+        
+        # Gera o objeto de credenciais oficial do Google
+        credenciais_google = Credentials.from_service_account_info(creds_dict, scopes=escopos)
+        
+        # Inicializa o cliente do gspread
+        cliente_gspread = gspread.authorize(credenciais_google)
+        
+        # Cria o objeto de conexão compatível com o seu código existente
+        conn = ConexaoManualSheets(cliente_gspread)
     else:
-        # Fallback padrão caso não existam as credenciais estruturadas
-        conn = st.connection("gsheets", type=GSheetsConnection)
+        st.error("Configurações 'connections.gsheets' não encontradas nos Secrets.")
+        st.stop()
 
 except Exception as e:
-    st.error(f"Erro ao conectar ao Google Sheets: {e}")
+    st.error(f"Erro ao conectar ao Google Sheets de forma direta: {e}")
     st.info("Por favor, verifique se as credenciais na aba 'Secrets' do Streamlit Cloud estão salvas corretamente.")
-    st.stop()  # Interrompe o script de forma amigável
-# ----------------------------------------
+    st.stop()
+# --------------------------------------------------
   
 # URL oficial de compartilhamento da sua planilha do Google Sheets
 URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M/edit?usp=sharing"  
