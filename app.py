@@ -13,16 +13,21 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  
 )  
 
-# Estilização CSS atualizada
+# Estilização CSS atualizada (Conteúdo subido no mobile)
 st.markdown("""  
     <style>  
     /* Ajuste para desktop (tamanho fixo) */
     h1 { font-size: 48px !important; }
 
-    /* Ajuste para dispositivos móveis (focado em preencher a linha) */
+    /* Ajuste para dispositivos móveis */
     @media (max-width: 600px) {
+        /* Sobe o conteúdo para verificar melhor os cards ao iniciar */
+        .main .block-container {
+            padding-top: 1rem !important;
+            padding-bottom: 0rem !important;
+        }
         h1 { 
-            font-size: 14vw !important; /* Tamanho maior para impacto */
+            font-size: 14vw !important; 
             width: 100% !important; 
             text-align: center !important;
             display: block !important;
@@ -31,7 +36,7 @@ st.markdown("""
             padding: 15px 0 !important; 
             box-sizing: border-box !important; 
         }
-        .mes-neon { font-size: 24px !important; }
+        .mes-neon { font-size: 24px !important; margin-bottom: 10px !important; }
     }
     .metric-box { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; margin-bottom: 10px; border-left: 6px solid; }  
     .metric-title { font-size: 11px; font-weight: bold; text-transform: uppercase; }  
