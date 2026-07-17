@@ -61,29 +61,23 @@ st.markdown("""
 # --- TRATAMENTO ROBUSTO DE CREDENCIAIS ---
 try:
     if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
-        # Criamos um dicionário com as credenciais cadastradas nos Secrets
-        creds_dict = dict(st.secrets["connections"]["gsheets"])
+        # Acessamos diretamente o dicionário do Streamlit Secrets na memória
+        secrets_gsheets = st.secrets["connections"]["gsheets"]
         
-        # Puxamos a chave privada e limpamos espaços invisíveis ou quebras de linha corrompidas
-        chave_crua = creds_dict.get("private_key", "")
-        chave_corrigida = chave_crua.replace("\\n", "\n").strip()
-        
-        # Criamos um dicionário contendo APENAS os parâmetros aceitos pela conexão do GSheets
-        # Isso evita que parâmetros extras como 'project_id' quebrem o conector
-        dados_conexao_filtrados = {
-            "private_key": chave_corrigida,
-            "client_email": creds_dict.get("client_email")
-        }
-        
-        # Iniciamos a conexão passando apenas as variáveis estritamente necessárias
-        conn = st.connection("gsheets", type=GSheetsConnection, **dados_conexao_filtrados)
-    else:
-        # Se por algum motivo as credenciais não estiverem cadastradas, tenta o padrão do Streamlit
-        conn = st.connection("gsheets", type=GSheetsConnection)
+        # Se a chave privada existir, corrigimos as quebras de linha direto no objeto de secrets
+        if "private_key" in secrets_gsheets:
+            chave_crua = secrets_gsheets["private_key"]
+            # Sobrescrevemos o valor no segredo do Streamlit com a formatação correta
+            secrets_gsheets["private_key"] = chave_crua.replace("\\n", "\n").strip()
+
+    # Chamamos a conexão padrão. Como corrigimos o st.secrets acima, 
+    # o Streamlit vai ler a chave corrigida automaticamente sem reclamar de parâmetros inesperados!
+    conn = st.connection("gsheets", type=GSheetsConnection)
+
 except Exception as e:
     st.error(f"Erro ao conectar ao Google Sheets: {e}")
     st.info("Por favor, verifique se as credenciais na aba 'Secrets' do Streamlit Cloud estão salvas corretamente.")
-    st.stop()  # Interrompe o script de forma amigável para exibir o erro ao usuário
+    st.stop()  # Interrompe o script de forma amigável
 # ----------------------------------------
   
 # URL oficial de compartilhamento da sua planilha do Google Sheets
