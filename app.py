@@ -13,7 +13,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  
 )  
 
-# Estilização CSS atualizada
+# Estilização CSS atualizada (Ajuste exato do F12 para mobile)
 st.markdown("""  
     <style>  
     /* Ajuste para desktop (tamanho fixo) */
@@ -21,10 +21,11 @@ st.markdown("""
 
     /* Ajuste para dispositivos móveis */
     @media (max-width: 600px) {
-        /* Sobe todo o conteúdo do app em 50px */
-        .main .block-container {
-            margin-top: -50px !important; 
-            padding-top: 1rem !important;
+        /* Alvo exato do container principal que você testou no F12 */
+        .stMainBlockContainer, .block-container {
+            padding-top: 1.5rem !important;
+            padding-bottom: 1rem !important;
+            margin-top: -35px !important; 
         }
         
         h1 { 
@@ -34,11 +35,12 @@ st.markdown("""
             display: block !important;
             white-space: nowrap !important;
             margin: 0 !important;
-            padding: 15px 0 !important; 
+            padding: 10px 0 !important; 
             box-sizing: border-box !important; 
         }
         .mes-neon { font-size: 24px !important; margin-bottom: 10px !important; }
     }
+    
     .metric-box { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; margin-bottom: 10px; border-left: 6px solid; }  
     .metric-title { font-size: 11px; font-weight: bold; text-transform: uppercase; }  
     .metric-value { font-size: 20px; color: #212529; font-weight: bold; }  
