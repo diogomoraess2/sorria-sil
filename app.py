@@ -59,31 +59,6 @@ st.markdown("""
 """, unsafe_allow_html=True)  
 
 # --- TRATAMENTO ROBUSTO DE CREDENCIAIS ---
-# Reconstrói o dicionário de conexões limpando e corrigindo quebras de linha na chave PEM
-conexao_configurada = False
-try:
-    if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
-        # Criamos uma cópia das credenciais em formato dicionário comum do Python
-        creds_dict = dict(st.secrets["connections"]["gsheets"])
-        
-        # Limpa eventuais problemas de formatação na chave privada
-        chave_crua = creds_dict.get("private_key", "")
-        
-        # Corrige quebras de linha literais escritas como string '\\n' ou convertidas incorretamente
-        chave_corrigida = chave_crua.replace("\\n", "\n").replace("\n", "\n")
-        
-        # Garante que as bordas da chave estão limpas
-        creds_dict["private_key"] = chave_corrigida.strip()
-        
-        # Instancia a conexão passando nosso dicionário corrigido manualmente
-        conn = st.connection("gsheets", type=GSheetsConnection, **creds_dict)
-        conexao_configurada = True
-except Exception as e:
-    st.error(f"Erro ao estruturar credenciais: {e}")
-
-# Caso a montagem manual falhe por alguma razão, tentamos o fallback padrão
-if not conexao_configurada:
-    # --- TRATAMENTO ROBUSTO DE CREDENCIAIS ---
 conexao_configurada = False
 try:
     if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
