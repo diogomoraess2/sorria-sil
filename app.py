@@ -168,14 +168,14 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# --- TÍTULO RESPONSIVO: ALINHAMENTO POR LINHA DE BASE (HORIZONTAIS) ---
+# --- TÍTULO RESPONSIVO: MÊS COM EFEITO NEON BRANCO ---
 st.markdown(
     f"""
     <style>
     .container-titulo {{
         display: flex;
-        align-items: baseline; /* Alinha todos os itens pela base das letras */
-        white-space: nowrap;   /* Proíbe quebra de linha */
+        align-items: baseline; 
+        white-space: nowrap;
         margin-bottom: 15px;
     }}
     .titulo-principal {{
@@ -183,17 +183,21 @@ st.markdown(
         font-weight: bold;
         margin: 0;
         display: flex;
-        align-items: baseline; /* Alinha o texto, pipeline e mês pela base */
+        align-items: baseline; 
     }}
     .emoji-dente {{
-        font-size: 2.5em;      /* Dente grande */
+        font-size: 2.5em;      
         margin-right: 15px;
+        line-height: 1;
     }}
-    .mes-reduzido {{
-        font-size: 0.55em;     /* Mês menor */
+    .mes-neon {{
+        font-size: 0.55em;
         font-weight: 300;
-        color: #6c757d;
+        color: #ffffff; /* Cor branca principal */
         margin-left: 10px;
+        vertical-align: 4px;
+        /* Efeito Neon: sombras múltiplas criam o brilho */
+        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00e6ff, 0 0 30px #00e6ff;
     }}
     
     /* Ajuste responsivo para Celulares */
@@ -208,6 +212,9 @@ st.markdown(
             font-size: 2.2em; 
             margin-right: 8px;
         }}
+        .mes-neon {{
+            vertical-align: 3px;
+        }}
     }}
     </style>
     
@@ -215,8 +222,8 @@ st.markdown(
         <span class="emoji-dente">🦷</span>
         <h1 class="titulo-principal">
             Sorria Sil 
-            <span style="font-weight: 300; font-size: 0.7em; margin-left: 10px;">|</span> 
-            <span class="mes-reduzido">{nome_aba_trabalho}</span>
+            <span style="font-weight: 300; font-size: 0.7em; margin-left: 10px; vertical-align: 4px; color: #ffffff;">|</span> 
+            <span class="mes-neon">{nome_aba_trabalho}</span>
         </h1>
     </div>
     """, 
