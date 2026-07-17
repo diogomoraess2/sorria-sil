@@ -1,5 +1,6 @@
 import streamlit as st  
 import pandas as pd  
+import plotly.express as px
 from datetime import datetime  
 from google.oauth2.service_account import Credentials
 import gspread
@@ -61,7 +62,6 @@ def carregar_dados_mes(aba):
   
 # --- INTERFACE ---
 if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = datetime.today().month
-if 'editando_mes' not in st.session_state: st.session_state['editando_mes'] = False
 
 st.markdown("<h1>🦷 Sorria Sil</h1>", unsafe_allow_html=True)
 
@@ -70,27 +70,13 @@ st.markdown("### Mês:")
 st.markdown(f'<span class="mes-neon">{MESES_PT[st.session_state["mes_atual_num"]]}</span>', unsafe_allow_html=True)
 st.write("") 
 
-# --- LÓGICA DE SELEÇÃO SEM TECLADO ACIDENTAL ---
-if not st.session_state['editando_mes']:
-    if st.button("Trocar Mês"):
-        st.session_state['editando_mes'] = True
-        st.rerun()
-else:
-    # O selectbox só aparece após clicar no botão, evitando foco automático[cite: 1]
-    novo_mes = st.selectbox(
-        "Selecione o mês:", 
-        options=list(MESES_PT.keys()), 
-        format_func=lambda x: MESES_PT[x],
-        index=st.session_state['mes_atual_num'] - 1,
-        placeholder="Escolha um mês..."
-    )
-    col_a, col_b = st.columns(2)
-    if col_a.button("Confirmar"):
-        st.session_state['mes_atual_num'] = novo_mes
-        st.session_state['editando_mes'] = False
-        st.rerun()
-    if col_b.button("Cancelar"):
-        st.session_state['editando_mes'] = False
+# --- MENU DE SELEÇÃO POR BOTÕES (Resolve o problema do teclado) ---
+st.markdown("##### Selecionar Mês:")
+col1, col2, col3 = st.columns(3)
+for i, (num, nome) in enumerate(MESES_PT.items()):
+    coluna_atual = [col1, col2, col3][i % 3]
+    if coluna_atual.button(nome, key=f"btn_{num}"):
+        st.session_state['mes_atual_num'] = num
         st.rerun()
 
 df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
@@ -113,7 +99,9 @@ for i, (titulo, col) in enumerate(metricas):
         st.markdown(f'<div class="metric-box"><div class="metric-title">{titulo}</div><div class="metric-value">R$ {totais[col]:,.2f}</div></div>', unsafe_allow_html=True)
 
 st.markdown("---")
-tab1, tab2 = st.tabs(["📝 Lançar", "📋 Dados"])
+# Estrutura de abas atualizada incluindo Gráficos
+tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
+
 with tab1:
     with st.form("form_registro", clear_on_submit=True):
         st.date_input("Data")
@@ -123,5 +111,15 @@ with tab1:
         st.number_input("Uber (R$)", step=5.0)
         if st.form_submit_button("SALVAR"):
             st.success("Dados enviados!")
+
 with tab2:
     st.dataframe(df_mes, use_container_width=True, hide_index=True)
+
+with tab3:
+    st.subheader("Evolução do Faturamento")
+    if not df_mes.empty and 'Data' in df_mes.columns and 'Total' in df_mes.columns:
+        df_plot = df_mes.sort_values(by='Data')
+        fig = px.line(df_plot, x='Data', y='Total', title='Total por Data', markers=True)
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("Dados insuficientes para gerar gráficos.")
