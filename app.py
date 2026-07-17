@@ -133,16 +133,16 @@ with tab2:
 with tab3:
     st.subheader("Análise Financeira")
     if not df_mes.empty:
-        # Preparação dos dados para o gráfico de pizza
+        # Preparação dos dados
         dados_pizza = {'Categoria': ['Dinheiro', 'Pix', 'Uber', 'A Receber'], 
                        'Valores': [totais['Dinheiro'], totais['Pix'], totais['Uber'], totais['Próximo mês']]}
         df_pizza = pd.DataFrame(dados_pizza)
         
-        # Mapeamento de cores (verde WhatsApp para 'A Receber')
+        # Mapeamento de cores solicitado: Pix (Amarelo Google #FBBC05), Uber (Vermelho #EA4335), A Receber (Verde WhatsApp #25D366)
         cores = {
             'Dinheiro': '#636EFA', 
-            'Pix': '#EF553B', 
-            'Uber': '#00CC96', 
+            'Pix': '#FBBC05', 
+            'Uber': '#EA4335', 
             'A Receber': '#25D366'
         }
         
