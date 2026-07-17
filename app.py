@@ -61,6 +61,7 @@ def carregar_dados_mes(aba):
   
 # --- INTERFACE ---
 if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = datetime.today().month
+if 'editando_mes' not in st.session_state: st.session_state['editando_mes'] = False
 
 st.markdown("<h1>🦷 Sorria Sil</h1>", unsafe_allow_html=True)
 
@@ -69,13 +70,27 @@ st.markdown("### Mês:")
 st.markdown(f'<span class="mes-neon">{MESES_PT[st.session_state["mes_atual_num"]]}</span>', unsafe_allow_html=True)
 st.write("") 
 
-# --- MENU DE SELEÇÃO POR BOTÕES (Sem teclado) ---
-st.markdown("##### Selecionar Mês:")
-col1, col2, col3 = st.columns(3)
-for i, (num, nome) in enumerate(MESES_PT.items()):
-    coluna_atual = [col1, col2, col3][i % 3]
-    if coluna_atual.button(nome, key=f"btn_{num}"):
-        st.session_state['mes_atual_num'] = num
+# --- LÓGICA DE SELEÇÃO SEM TECLADO ACIDENTAL ---
+if not st.session_state['editando_mes']:
+    if st.button("Trocar Mês"):
+        st.session_state['editando_mes'] = True
+        st.rerun()
+else:
+    # O selectbox só aparece após clicar no botão, evitando foco automático[cite: 1]
+    novo_mes = st.selectbox(
+        "Selecione o mês:", 
+        options=list(MESES_PT.keys()), 
+        format_func=lambda x: MESES_PT[x],
+        index=st.session_state['mes_atual_num'] - 1,
+        placeholder="Escolha um mês..."
+    )
+    col_a, col_b = st.columns(2)
+    if col_a.button("Confirmar"):
+        st.session_state['mes_atual_num'] = novo_mes
+        st.session_state['editando_mes'] = False
+        st.rerun()
+    if col_b.button("Cancelar"):
+        st.session_state['editando_mes'] = False
         st.rerun()
 
 df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
