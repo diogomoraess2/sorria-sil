@@ -168,7 +168,7 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# --- TÍTULO RESPONSIVO: MÊS EM LINHA SEPARADA COM DESCRIÇÃO ---
+# --- TÍTULO RESPONSIVO: MÊS EM LINHA SEPARADA E COMPENSAÇÃO DO EMOJI ---
 st.markdown(
     f"""
     <style>
@@ -188,12 +188,13 @@ st.markdown(
     }}
     .emoji-dente {{
         font-size: 2.5em;
-        margin-right: 15px;
+        margin-left: -8px; /* Ajuste para eliminar a margem do emoji */
+        margin-right: 10px; /* Compensação da margem */
         line-height: 1;
     }}
     .linha-mes {{
         margin-top: 5px;
-        font-size: 1.2em; /* Tamanho do texto 'Mês:' */
+        font-size: 1.2em;
         font-weight: 300;
         color: #ffffff;
     }}
@@ -211,6 +212,7 @@ st.markdown(
         }}
         .emoji-dente {{
             font-size: 2.2em;
+            margin-left: -5px; /* Ajuste proporcional no mobile */
         }}
     }}
     </style>
