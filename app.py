@@ -13,7 +13,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  
 )  
 
-# Estilização CSS atualizada (Conteúdo subido no mobile)
+# Estilização CSS atualizada
 st.markdown("""  
     <style>  
     /* Ajuste para desktop (tamanho fixo) */
@@ -21,11 +21,12 @@ st.markdown("""
 
     /* Ajuste para dispositivos móveis */
     @media (max-width: 600px) {
-        /* Sobe o conteúdo para verificar melhor os cards ao iniciar */
+        /* Sobe todo o conteúdo do app em 50px */
         .main .block-container {
+            margin-top: -50px !important; 
             padding-top: 1rem !important;
-            padding-bottom: 0rem !important;
         }
+        
         h1 { 
             font-size: 14vw !important; 
             width: 100% !important; 
