@@ -65,6 +65,9 @@ try:
         # Criamos um dicionário com as credenciais cadastradas nos Secrets
         creds_dict = dict(st.secrets["connections"]["gsheets"])
         
+        # REMOVE O "type" DO DICIONÁRIO PARA EVITAR DUPLICIDADE COM GSheetsConnection
+        creds_dict.pop("type", None)
+        
         # Puxamos a chave privada e limpamos espaços invisíveis ou quebras de linha corrompidas
         chave_crua = creds_dict.get("private_key", "")
         
