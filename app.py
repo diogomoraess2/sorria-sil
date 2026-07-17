@@ -95,8 +95,8 @@ if not df_mes.empty:
 else:
     totais = pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
-# Mapeamento de cores
-cores = {'Total': '#007bff', 'Dinheiro': '#636EFA', 'Pix': '#FBBC05', 'A Receber': '#25D366', 'Uber': '#EA4335'}
+# Mapeamento de cores (INVERTIDO: Dinheiro agora é verde, A Receber agora é azul claro)
+cores = {'Total': '#007bff', 'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'A Receber': '#636EFA', 'Uber': '#EA4335'}
 
 # --- MÉTRICAS COM CORES NO TÍTULO E NA BORDA ---
 cols = st.columns(5)
@@ -135,7 +135,8 @@ with tab3:
         dados_pizza = {'Categoria': ['Dinheiro', 'Pix', 'Uber', 'A Receber'], 
                        'Valores': [totais['Dinheiro'], totais['Pix'], totais['Uber'], totais['Próximo mês']]}
         df_pizza = pd.DataFrame(dados_pizza)
-        cores_pizza = {'Dinheiro': '#636EFA', 'Pix': '#FBBC05', 'Uber': '#EA4335', 'A Receber': '#25D366'}
+        # Mapeamento de cores para o gráfico (INVERTIDO)
+        cores_pizza = {'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'Uber': '#EA4335', 'A Receber': '#636EFA'}
         fig_pizza = px.pie(df_pizza, values='Valores', names='Categoria', title="Distribuição do Total", color='Categoria', color_discrete_map=cores_pizza)
         st.plotly_chart(fig_pizza, use_container_width=True)
         
