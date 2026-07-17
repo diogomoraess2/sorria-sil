@@ -1,5 +1,6 @@
 import streamlit as st  
 import pandas as pd  
+import plotly.express as px # Import necessário para os gráficos
 from datetime import datetime  
 from google.oauth2.service_account import Credentials
 import gspread
@@ -76,7 +77,6 @@ if not st.session_state['editando_mes']:
         st.session_state['editando_mes'] = True
         st.rerun()
 else:
-    # O selectbox só aparece após clicar no botão, evitando foco automático[cite: 1]
     novo_mes = st.selectbox(
         "Selecione o mês:", 
         options=list(MESES_PT.keys()), 
@@ -113,7 +113,10 @@ for i, (titulo, col) in enumerate(metricas):
         st.markdown(f'<div class="metric-box"><div class="metric-title">{titulo}</div><div class="metric-value">R$ {totais[col]:,.2f}</div></div>', unsafe_allow_html=True)
 
 st.markdown("---")
-tab1, tab2 = st.tabs(["📝 Lançar", "📋 Dados"])
+
+# --- ABAS COM GRÁFICOS ---
+tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
+
 with tab1:
     with st.form("form_registro", clear_on_submit=True):
         st.date_input("Data")
@@ -123,5 +126,21 @@ with tab1:
         st.number_input("Uber (R$)", step=5.0)
         if st.form_submit_button("SALVAR"):
             st.success("Dados enviados!")
+
 with tab2:
     st.dataframe(df_mes, use_container_width=True, hide_index=True)
+
+with tab3:
+    if not df_mes.empty:
+        # Gráfico de Pizza (Dinheiro vs Pix vs Uber)
+        dados_pizza = {'Categoria': ['Dinheiro', 'Pix', 'Uber'], 
+                       'Valores': [totais['Dinheiro'], totais['Pix'], totais['Uber']]}
+        fig_pizza = px.pie(pd.DataFrame(dados_pizza), values='Valores', names='Categoria', title="Distribuição de Recebimentos")
+        st.plotly_chart(fig_pizza, use_container_width=True)
+        
+        # Gráfico de Evolução (Linha)
+        df_plot = df_mes.sort_values(by='Data')
+        fig_linha = px.line(df_plot, x='Data', y='Total', title='Evolução do Faturamento', markers=True)
+        st.plotly_chart(fig_linha, use_container_width=True)
+    else:
+        st.info("Sem dados suficientes para gráficos neste mês.")
