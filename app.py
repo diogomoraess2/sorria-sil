@@ -168,20 +168,36 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
+# --- TÍTULO RESPONSIVO (DESKTOP E MOBILE) ---
 st.markdown(
     f"""
-    <h1 style="
-        font-size: clamp(30px, 5.5vw, 50px); 
-        white-space: nowrap; 
-        overflow: hidden; 
-        text-overflow: ellipsis;
+    <style>
+    /* Estilo padrão para Computador (Desktop) */
+    .titulo-responsivo {{
+        font-size: 42px;
+        font-weight: bold;
         margin-bottom: 15px;
-    ">
+        white-space: nowrap;
+    }}
+    
+    /* Ajuste automático para Celulares (telas de até 600px de largura) */
+    @media (max-width: 600px) {{
+        .titulo-responsivo {{
+            font-size: clamp(22px, 6.5vw, 32px); /* Diminui o tamanho da fonte proporcionalmente */
+            white-space: normal;                /* Permite que o texto quebre linha se precisar */
+            word-wrap: break-word;              /* Evita que o texto ultrapasse a tela */
+            line-height: 1.2;
+        }}
+    }}
+    </style>
+    
+    <h1 class="titulo-responsivo">
         🦷 Sorria Sil <span style="color: #6c757d; font-weight: 300;">|</span> {nome_aba_trabalho}
     </h1>
     """, 
     unsafe_allow_html=True
-)  
+)
+# --------------------------------------------  
   
 df_mes = carregar_dados_mes(nome_aba_trabalho)  
   
