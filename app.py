@@ -25,7 +25,7 @@ st.markdown("""
         .stMainBlockContainer, .block-container {
             padding-top: 1.5rem !important;
             padding-bottom: 1rem !important;
-            margin-top: -2px !important; 
+            margin-top: -1px !important; 
         }
         
         h1 { 
