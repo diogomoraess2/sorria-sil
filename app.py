@@ -13,15 +13,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  
 )  
 
-# Estilização CSS atualizada (Ajuste exato do F12 para mobile)
+# Estilização CSS completa
 st.markdown("""  
     <style>  
-    /* Ajuste para desktop (tamanho fixo) */
+    /* Ajuste para desktop */
     h1 { font-size: 48px !important; }
 
     /* Ajuste para dispositivos móveis */
     @media (max-width: 600px) {
-        /* Alvo exato do container principal que você testou no F12 */
         .stMainBlockContainer, .block-container {
             padding-top: 1.5rem !important;
             padding-bottom: 1rem !important;
@@ -40,11 +39,25 @@ st.markdown("""
         }
         .mes-neon { font-size: 24px !important; margin-bottom: 10px !important; }
     }
+
+    /* Estilo padrão do Mês (Modo Escuro) */
+    .mes-neon { 
+        font-weight: 700; 
+        font-size: 28px; 
+        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00e6ff, 0 0 30px #00e6ff; 
+        color: #ffffff; 
+    }
+
+    /* Ajuste de cor para Modo Claro */
+    @media (prefers-color-scheme: light) {
+        .mes-neon { 
+            color: #8A2BE2 !important; 
+        }
+    }
     
     .metric-box { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; margin-bottom: 10px; border-left: 6px solid; }  
     .metric-title { font-size: 11px; font-weight: bold; text-transform: uppercase; }  
     .metric-value { font-size: 20px; color: #212529; font-weight: bold; }  
-    .mes-neon { font-weight: 700; font-size: 28px; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00e6ff, 0 0 30px #00e6ff; color: #ffffff; }  
     </style>  
 """, unsafe_allow_html=True)  
 
