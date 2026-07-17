@@ -13,9 +13,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  
 )  
 
-# Estilização CSS
+# Estilização CSS com ajuste para celular
 st.markdown("""  
     <style>  
+    /* Ajuste para dispositivos móveis */
+    @media (max-width: 600px) {
+        h1 { font-size: 32px !important; }
+        .mes-neon { font-size: 22px !important; }
+    }
     .metric-box { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; margin-bottom: 10px; border-left: 6px solid; }  
     .metric-title { font-size: 11px; font-weight: bold; text-transform: uppercase; }  
     .metric-value { font-size: 20px; color: #212529; font-weight: bold; }  
@@ -64,7 +69,6 @@ if 'editando_mes' not in st.session_state: st.session_state['editando_mes'] = Fa
 
 st.markdown("<h1>🦷 Sorria Sil</h1>", unsafe_allow_html=True)
 
-# Texto "Mês" removido conforme solicitado
 st.markdown(f'<span class="mes-neon">{MESES_PT[st.session_state["mes_atual_num"]]}</span>', unsafe_allow_html=True)
 
 # Lógica de seleção
@@ -95,10 +99,10 @@ if not df_mes.empty:
 else:
     totais = pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
-# Mapeamento de cores (Dinheiro = Verde, A Receber = Azul)
+# Mapeamento de cores
 cores = {'Total': '#007bff', 'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'A Receber': '#636EFA', 'Uber': '#EA4335'}
 
-# --- MÉTRICAS COM CORES NO TÍTULO E NA BORDA ---
+# --- MÉTRICAS ---
 cols = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
 for i, (titulo, col) in enumerate(metricas):
@@ -135,7 +139,6 @@ with tab3:
         dados_pizza = {'Categoria': ['Dinheiro', 'Pix', 'Uber', 'A Receber'], 
                        'Valores': [totais['Dinheiro'], totais['Pix'], totais['Uber'], totais['Próximo mês']]}
         df_pizza = pd.DataFrame(dados_pizza)
-        # Mapeamento de cores para o gráfico
         cores_pizza = {'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'Uber': '#EA4335', 'A Receber': '#636EFA'}
         fig_pizza = px.pie(df_pizza, values='Valores', names='Categoria', title="Distribuição do Total", color='Categoria', color_discrete_map=cores_pizza)
         st.plotly_chart(fig_pizza, use_container_width=True)
