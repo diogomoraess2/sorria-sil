@@ -83,6 +83,28 @@ except Exception as e:
 
 # Caso a montagem manual falhe por alguma razão, tentamos o fallback padrão
 if not conexao_configurada:
+    # --- TRATAMENTO ROBUSTO DE CREDENCIAIS ---
+conexao_configurada = False
+try:
+    if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
+        # Criamos um dicionário com as credenciais cadastradas nos Secrets
+        creds_dict = dict(st.secrets["connections"]["gsheets"])
+        
+        # Puxamos a chave privada e limpamos espaços invisíveis ou quebras de linha corrompidas
+        chave_crua = creds_dict.get("private_key", "")
+        
+        # Garante a formatação exata que a biblioteca de criptografia do Google exige
+        chave_corrigida = chave_crua.replace("\\n", "\n").strip()
+        creds_dict["private_key"] = chave_corrigida
+        
+        # Iniciamos a conexão passando os parâmetros limpos manualmente
+        conn = st.connection("gsheets", type=GSheetsConnection, **creds_dict)
+        conexao_configurada = True
+except Exception as e:
+    st.sidebar.warning(f"Aviso na preparação das credenciais: {e}")
+
+# Caso o tratamento manual acima falhe, tenta o método padrão como plano B
+if not conexao_configurada:
     conn = st.connection("gsheets", type=GSheetsConnection)
 # ----------------------------------------
   
