@@ -1,3 +1,5 @@
+streamlit>=1.22.0
 pandas
 plotly
-openpyxl
+st-theme
+st-gsheets-connection
