@@ -168,56 +168,18 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# --- TÍTULO RESPONSIVO: QUEBRA DINÂMICA NO CELULAR PARA MESES LONGOS ---
+# --- TÍTULO RESPONSIVO: VERSÃO CORRIGIDA PARA RENDERIZAÇÃO ---
 st.markdown(
     f"""
     <style>
-    .container-titulo {{
-        display: flex;
-        flex-direction: column; /* Permite empilhamento se necessário */
-        white-space: nowrap;
-        margin-bottom: 15px;
-    }}
-    .linha-superior {{
-        display: flex;
-        align-items: baseline;
-    }}
-    .emoji-dente {{
-        font-size: 2.5em;      
-        margin-right: 15px;
-        line-height: 1;
-    }}
-    .bloco-mes {{
-        display: flex;
-        align-items: baseline;
-    }}
+    .container-titulo {{ display: flex; flex-direction: column; }}
+    .linha-superior {{ display: flex; align-items: center; }}
+    .emoji-dente {{ font-size: 2.5em; margin-right: 15px; line-height: 1; }}
     .mes-neon {{
-        font-size: 0.55em;
+        font-size: 1.5em;
         font-weight: 300;
         color: #ffffff;
-        margin-left: 10px;
-        vertical-align: 4px;
         text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00e6ff, 0 0 30px #00e6ff;
-    }}
-    
-    /* Ajuste responsivo para Celulares */
-    @media (max-width: 600px) {{
-        .container-titulo {{
-            margin-left: -5px;
-        }}
-        .linha-superior {{
-            font-size: 5.6vw;
-        }}
-        /* Se o mês for longo, força a quebra de linha no mobile */
-        .quebra-mobile {{
-            display: block; 
-            margin-top: 5px;
-            font-size: 0.8em;
-        }}
-        /* Oculta o pipeline apenas no mobile se o mês for longo */
-        .ocultar-mobile {{
-            display: none;
-        }}
     }}
     </style>
     
@@ -226,9 +188,8 @@ st.markdown(
             <span class="emoji-dente">🦷</span>
             <h1 style="margin: 0; font-size: 42px;">Sorria Sil</h1>
         </div>
-        
-        <div class="quebra-mobile">
-            <span class="ocultar-mobile" style="font-weight: 300; color: #ffffff;">|</span> 
+        <div style="margin-top: 5px;">
+            <span style="font-weight: 300; color: #ffffff;">|</span> 
             <span class="mes-neon">{nome_aba_trabalho}</span>
         </div>
     </div>
