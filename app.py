@@ -76,11 +76,13 @@ if not st.session_state['editando_mes']:
         st.session_state['editando_mes'] = True
         st.rerun()
 else:
+    # O selectbox só aparece após clicar no botão, evitando foco automático[cite: 1]
     novo_mes = st.selectbox(
         "Selecione o mês:", 
         options=list(MESES_PT.keys()), 
         format_func=lambda x: MESES_PT[x],
-        index=st.session_state['mes_atual_num'] - 1
+        index=st.session_state['mes_atual_num'] - 1,
+        placeholder="Escolha um mês..."
     )
     col_a, col_b = st.columns(2)
     if col_a.button("Confirmar"):
