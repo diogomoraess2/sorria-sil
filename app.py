@@ -81,19 +81,26 @@ st.markdown("### Mês:")
 st.markdown(f'<span class="mes-neon">{nome_aba}</span>', unsafe_allow_html=True)
 st.write("") 
 
+# Popover corrigido para não abrir teclado no celular
 with st.popover("Trocar Mês"):
-    novo_mes = st.selectbox("Selecione:", list(MESES_PT.keys()), format_func=lambda x: MESES_PT[x], index=st.session_state['mes_atual_num'] - 1)
+    st.markdown("##### Escolha o período:")
+    novo_mes = st.selectbox(
+        "Selecione:", 
+        options=list(MESES_PT.keys()), 
+        format_func=lambda x: MESES_PT[x], 
+        index=st.session_state['mes_atual_num'] - 1,
+        label_visibility="collapsed" # Evita foco automático do teclado
+    )
     if st.button("Confirmar"):
         st.session_state['mes_atual_num'] = novo_mes
         st.rerun()
 
 df_mes = carregar_dados_mes(nome_aba)
 
-# Cálculo de totais com limpeza robusta para evitar valores "astronômicos"
+# Cálculo de totais
 if not df_mes.empty:
     for col in ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']:
         if col in df_mes.columns:
-            # Limpa R$, pontos de milhar e converte vírgula para ponto decimal
             limpo = df_mes[col].replace(r'[R$\s.]', '', regex=True).str.replace(',', '.', regex=False)
             df_mes[col] = pd.to_numeric(limpo, errors='coerce').fillna(0)
     totais = df_mes[['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']].sum()
