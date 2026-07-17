@@ -168,7 +168,7 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# --- TÍTULO RESPONSIVO: EMOJI DESTAQUE MÁXIMO E ALINHAMENTO CENTRAL ---
+# --- TÍTULO RESPONSIVO: ALINHAMENTO CENTRAL VERTICAL TOTAL ---
 st.markdown(
     f"""
     <style>
@@ -184,19 +184,23 @@ st.markdown(
         font-weight: bold;
         margin: 0;
         display: flex;
-        align-items: center; /* Centraliza o texto verticalmente com o emoji */
+        align-items: center; /* Garante alinhamento central */
     }}
     .emoji-dente {{
-        font-size: 2.5em; /* Dente ainda maior para máximo impacto */
+        font-size: 2.5em; 
         margin-right: 15px;
-        line-height: 0.8; /* Ajuste fino para o centro do dente bater com o centro do texto */
+        line-height: 0.8;
+    }}
+    .bloco-extra {{
+        display: flex;
+        align-items: center; /* Centraliza o pipeline e o mês verticalmente */
+        margin-left: 10px;
     }}
     .mes-reduzido {{
-        font-size: 0.55em; /* Nome do mês mais compacto para ceder espaço ao dente gigante */
+        font-size: 0.55em; 
         font-weight: 300;
         color: #6c757d;
-        margin-left: 8px;
-        align-self: center;
+        margin-left: 10px;
     }}
     
     /* Ajuste responsivo para Celulares */
@@ -205,10 +209,10 @@ st.markdown(
             margin-left: -5px;
         }}
         .titulo-principal {{
-            font-size: 5.6vw; /* Ajustado para acomodar o emoji gigante */
+            font-size: 5.6vw; 
         }}
         .emoji-dente {{
-            font-size: 2.2em; /* Mantém dente bem grande no mobile */
+            font-size: 2.2em; 
             margin-right: 8px;
         }}
     }}
@@ -217,8 +221,11 @@ st.markdown(
     <div class="container-titulo">
         <span class="emoji-dente">🦷</span>
         <h1 class="titulo-principal">
-            Sorria Sil <span style="font-weight: 300; font-size: 0.7em; margin: 0 5px;">|</span> 
-            <span class="mes-reduzido">{nome_aba_trabalho}</span>
+            Sorria Sil 
+            <span class="bloco-extra">
+                <span style="font-weight: 300; font-size: 0.7em;">|</span> 
+                <span class="mes-reduzido">{nome_aba_trabalho}</span>
+            </span>
         </h1>
     </div>
     """, 
