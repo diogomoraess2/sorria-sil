@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd  
 from datetime import datetime  
 import plotly.express as px  
-from streamlit_gsheets import GSheetsConnection  
 from google.oauth2.service_account import Credentials
 import gspread
 
@@ -62,7 +61,7 @@ st.markdown("""
 
 # --- CONEXÃO ROBUSTA E DIRETA COM GOOGLE SHEETS ---
 class ConexaoManualSheets:
-    """Classe simulada para manter a compatibilidade com o restante do seu código (.read e .update)"""
+    """Classe simulada para manter a compatibilidade com o restante do código (.read e .update)"""
     def __init__(self, client):
         self.client = client
 
@@ -81,17 +80,24 @@ class ConexaoManualSheets:
         # Envia o cabeçalho e as linhas atualizadas
         worksheet.update([data.columns.values.tolist()] + data.values.tolist())
 
+# --- TRATAMENTO ROBUSTO DE CREDENCIAIS (LIMPEZA PROFUNDA) ---
 try:
     if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
-        # Criamos o dicionário de credenciais na memória
         creds_dict = dict(st.secrets["connections"]["gsheets"])
         
-        # Corrigimos as quebras de linha da chave privada
         if "private_key" in creds_dict:
-            chave_crua = creds_dict["private_key"]
-            creds_dict["private_key"] = chave_crua.replace("\\n", "\n").strip()
+            # 1. Remove qualquer caractere que não seja imprimível ou que cause erro de codificação
+            chave = creds_dict["private_key"]
+            
+            # 2. Garante que as bordas da chave estão presentes e corretas
+            if "-----BEGIN PRIVATE KEY-----" not in chave:
+                chave = "-----BEGIN PRIVATE KEY-----\n" + chave
+            if "-----END PRIVATE KEY-----" not in chave:
+                chave = chave + "\n-----END PRIVATE KEY-----"
+            
+            # 3. Força a formatação de linha correta, removendo \r ou espaços duplos
+            creds_dict["private_key"] = chave.replace("\\n", "\n").replace("\r", "").strip()
         
-        # Escopos necessários para ler e escrever no Google Drive / Google Sheets
         escopos = [
             "https://www.googleapis.com/auth/spreadsheets",
             "https://www.googleapis.com/auth/drive"
@@ -106,11 +112,10 @@ try:
         # Cria o objeto de conexão compatível com o seu código existente
         conn = ConexaoManualSheets(cliente_gspread)
     else:
-        st.error("Configurações 'connections.gsheets' não encontradas nos Secrets.")
+        st.error("Configurações não encontradas nos Secrets.")
         st.stop()
-
 except Exception as e:
-    st.error(f"Erro ao conectar ao Google Sheets de forma direta: {e}")
+    st.error(f"Erro ao conectar ao Google Sheets: {e}")
     st.info("Por favor, verifique se as credenciais na aba 'Secrets' do Streamlit Cloud estão salvas corretamente.")
     st.stop()
 # --------------------------------------------------
