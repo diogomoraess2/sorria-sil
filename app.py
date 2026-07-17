@@ -13,21 +13,16 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  
 )  
 
-# Estilização CSS e Script de Tela Cheia
+# Estilização CSS atualizada
 st.markdown("""  
     <style>  
-    /* Esconder elementos padrão para visual de App */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    
-    /* Ajuste para desktop */
+    /* Ajuste para desktop (tamanho fixo) */
     h1 { font-size: 48px !important; }
 
-    /* Ajuste para mobile */
+    /* Ajuste para dispositivos móveis (focado em preencher a linha) */
     @media (max-width: 600px) {
         h1 { 
-            font-size: 14vw !important; 
+            font-size: 14vw !important; /* Tamanho maior para impacto */
             width: 100% !important; 
             text-align: center !important;
             display: block !important;
@@ -43,22 +38,7 @@ st.markdown("""
     .metric-value { font-size: 20px; color: #212529; font-weight: bold; }  
     .mes-neon { font-weight: 700; font-size: 28px; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00e6ff, 0 0 30px #00e6ff; color: #ffffff; }  
     </style>  
-
-    <script>
-    function openFullscreen() {
-        var elem = document.documentElement;
-        if (elem.requestFullscreen) { elem.requestFullscreen(); }
-    }
-    </script>
 """, unsafe_allow_html=True)  
-
-# --- BOTÃO DE TELA CHEIA E SAIR ---
-col_fs, col_sair = st.columns(2)
-with col_fs:
-    st.markdown('<button onclick="openFullscreen()" style="width:100%; padding:10px;">Tela Cheia 📱</button>', unsafe_allow_html=True)
-with col_sair:
-    if st.button("❌ Sair do App"):
-        st.markdown('<meta http-equiv="refresh" content="0; url=https://www.google.com">', unsafe_allow_html=True)
 
 # --- CONEXÃO ---
 class ConexaoManualSheets:
@@ -85,5 +65,98 @@ except Exception:
 URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M/edit?usp=sharing"  
 MESES_PT = {1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto', 9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'}  
 
-# ... (Função carregar_dados_mes e lógica de interface permanecem as mesmas)
-# [Recomendo manter o restante do código que você já validou]
+def carregar_dados_mes(aba):  
+    try:  
+        df = conn.read(spreadsheet=URL_PLANILHA, sheet=aba)  
+        df = df.dropna(how='all')
+        if not df.empty and 'Data' in df.columns:
+            df['Data'] = pd.to_datetime(df['Data'], dayfirst=True, errors='coerce').dt.date  
+            return df.dropna(subset=['Data'])
+    except: pass  
+    return pd.DataFrame(columns=['Data', 'Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])  
+  
+# --- INTERFACE ---
+if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = datetime.today().month
+if 'editando_mes' not in st.session_state: st.session_state['editando_mes'] = False
+
+st.markdown("<h1>🦷 Sorria Sil</h1>", unsafe_allow_html=True)
+
+st.markdown(f'<span class="mes-neon">{MESES_PT[st.session_state["mes_atual_num"]]}</span>', unsafe_allow_html=True)
+
+# Lógica de seleção
+if not st.session_state['editando_mes']:
+    if st.button("Trocar Mês"):
+        st.session_state['editando_mes'] = True
+        st.rerun()
+else:
+    novo_mes = st.selectbox("Selecione o mês:", options=list(MESES_PT.keys()), format_func=lambda x: MESES_PT[x], index=st.session_state['mes_atual_num'] - 1)
+    col_a, col_b = st.columns(2)
+    if col_a.button("Confirmar"):
+        st.session_state['mes_atual_num'] = novo_mes
+        st.session_state['editando_mes'] = False
+        st.rerun()
+    if col_b.button("Cancelar"):
+        st.session_state['editando_mes'] = False
+        st.rerun()
+
+df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
+
+# Cálculo de totais
+if not df_mes.empty:
+    for col in ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']:
+        if col in df_mes.columns:
+            limpo = df_mes[col].replace(r'[R$\s.]', '', regex=True).str.replace(',', '.', regex=False)
+            df_mes[col] = pd.to_numeric(limpo, errors='coerce').fillna(0)
+    totais = df_mes[['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']].sum()
+else:
+    totais = pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
+
+# Mapeamento de cores
+cores = {'Total': '#007bff', 'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'A Receber': '#636EFA', 'Uber': '#EA4335'}
+
+# --- MÉTRICAS ---
+cols = st.columns(5)
+metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
+for i, (titulo, col) in enumerate(metricas):
+    cor_lateral = cores.get(titulo, '#007bff')
+    with cols[i]:
+        st.markdown(f'''
+            <div class="metric-box" style="border-left-color: {cor_lateral};">
+                <div class="metric-title" style="color: {cor_lateral};">{titulo}</div>
+                <div class="metric-value">R$ {totais[col]:,.2f}</div>
+            </div>
+        ''', unsafe_allow_html=True)
+
+st.markdown("---")
+
+# --- ABAS ---
+tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
+
+with tab1:
+    with st.form("form_registro", clear_on_submit=True):
+        st.date_input("Data")
+        st.number_input("Total (R$)", step=10.0)
+        st.number_input("Dinheiro (R$)", step=10.0)
+        st.number_input("Pix (R$)", step=10.0)
+        st.number_input("Uber (R$)", step=5.0)
+        if st.form_submit_button("SALVAR"):
+            st.success("Dados enviados!")
+
+with tab2:
+    st.dataframe(df_mes, use_container_width=True, hide_index=True)
+
+with tab3:
+    st.subheader("Análise Financeira")
+    if not df_mes.empty:
+        dados_pizza = {'Categoria': ['Dinheiro', 'Pix', 'Uber', 'A Receber'], 
+                       'Valores': [totais['Dinheiro'], totais['Pix'], totais['Uber'], totais['Próximo mês']]}
+        df_pizza = pd.DataFrame(dados_pizza)
+        cores_pizza = {'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'Uber': '#EA4335', 'A Receber': '#636EFA'}
+        fig_pizza = px.pie(df_pizza, values='Valores', names='Categoria', title="Distribuição do Total", color='Categoria', color_discrete_map=cores_pizza)
+        st.plotly_chart(fig_pizza, use_container_width=True)
+        
+        df_plot = df_mes.sort_values(by='Data')
+        fig_linha = px.line(df_plot, x='Data', y='Total', title='Evolução do Faturamento Total', markers=True)
+        st.plotly_chart(fig_linha, use_container_width=True)
+    else:
+        st.info("Sem dados suficientes para gráficos.")
