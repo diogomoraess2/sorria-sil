@@ -61,7 +61,7 @@ st.markdown("""
 # --- TRATAMENTO ROBUSTO DE CREDENCIAIS ---
 try:
     if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
-        # Criamos um dicionário comum na memória (que aceita alterações) copiando os dados dos Secrets
+        # Criamos um dicionário comum na memória copiando os dados dos Secrets
         creds_dict = dict(st.secrets["connections"]["gsheets"])
         
         # Corrigimos as quebras de linha da chave privada dentro dessa cópia editável
@@ -69,9 +69,13 @@ try:
             chave_crua = creds_dict["private_key"]
             creds_dict["private_key"] = chave_crua.replace("\\n", "\n").strip()
         
-        # O conector do GSheets aceita receber todo o dicionário de credenciais formatado
-        # através de um argumento especial chamado 'credentials'
-        conn = st.connection("gsheets", type=GSheetsConnection, credentials=creds_dict)
+        # O argumento correto para injetar o dicionário de credenciais corrigido 
+        # na biblioteca streamlit-gsheets é 'gspread_client_or_credentials_dict'
+        conn = st.connection(
+            "gsheets", 
+            type=GSheetsConnection, 
+            gspread_client_or_credentials_dict=creds_dict
+        )
     else:
         # Fallback padrão caso não existam as credenciais estruturadas
         conn = st.connection("gsheets", type=GSheetsConnection)
