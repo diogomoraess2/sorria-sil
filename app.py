@@ -13,12 +13,20 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  
 )  
 
-# Estilização CSS com ajuste para celular
+# Estilização CSS com ajuste de largura total para celular
 st.markdown("""  
     <style>  
-    /* Ajuste para dispositivos móveis */
+    /* Ajuste para dispositivos móveis (preenchendo a linha inteira) */
     @media (max-width: 600px) {
-        h1 { font-size: 32px !important; }
+        h1 { 
+            font-size: 11.5vw !important; 
+            width: 100% !important; 
+            text-align: center !important;
+            display: block !important;
+            white-space: nowrap !important;
+            margin: 0 !important;
+            padding: 10px 0 !important;
+        }
         .mes-neon { font-size: 22px !important; }
     }
     .metric-box { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; margin-bottom: 10px; border-left: 6px solid; }  
@@ -99,10 +107,10 @@ if not df_mes.empty:
 else:
     totais = pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
-# Mapeamento de cores
+# Mapeamento de cores (Dinheiro = Verde, A Receber = Azul)
 cores = {'Total': '#007bff', 'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'A Receber': '#636EFA', 'Uber': '#EA4335'}
 
-# --- MÉTRICAS ---
+# --- MÉTRICAS COM CORES NO TÍTULO E NA BORDA ---
 cols = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
 for i, (titulo, col) in enumerate(metricas):
