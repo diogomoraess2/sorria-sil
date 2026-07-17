@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd  
 from datetime import datetime  
 import plotly.express as px  
-from streamlit_gsheets import GSheetsConnection  # Novo conector oficial
+from streamlit_gsheets import GSheetsConnection  
 
 # Configuração da página do Streamlit otimizada para Celular
 st.set_page_config(  
@@ -58,16 +58,32 @@ st.markdown("""
     </style>  
 """, unsafe_allow_html=True)  
 
-# --- TRATAMENTO CRÍTICO DE CREDENCIAIS ---
-# Força a conversão de '\\n' para quebras de linha reais na memória do Streamlit
-# Isso evita o bug de leitura de chaves privadas PEM no Linux do Streamlit Cloud
+# --- TRATAMENTO ROBUSTO DE CREDENCIAIS ---
+# Reconstrói o dicionário de conexões limpando e corrigindo quebras de linha na chave PEM
+conexao_configurada = False
 try:
     if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
-        pk = st.secrets["connections"]["gsheets"]["private_key"]
-        # Substitui os caracteres literais '\n' por quebras de linha verdadeiras
-        st.secrets["connections"]["gsheets"]["private_key"] = pk.replace("\\n", "\n")
+        # Criamos uma cópia das credenciais em formato dicionário comum do Python
+        creds_dict = dict(st.secrets["connections"]["gsheets"])
+        
+        # Limpa eventuais problemas de formatação na chave privada
+        chave_crua = creds_dict.get("private_key", "")
+        
+        # Corrige quebras de linha literais escritas como string '\\n' ou convertidas incorretamente
+        chave_corrigida = chave_crua.replace("\\n", "\n").replace("\n", "\n")
+        
+        # Garante que as bordas da chave estão limpas
+        creds_dict["private_key"] = chave_corrigida.strip()
+        
+        # Instancia a conexão passando nosso dicionário corrigido manualmente
+        conn = st.connection("gsheets", type=GSheetsConnection, **creds_dict)
+        conexao_configurada = True
 except Exception as e:
-    pass
+    st.error(f"Erro ao estruturar credenciais: {e}")
+
+# Caso a montagem manual falhe por alguma razão, tentamos o fallback padrão
+if not conexao_configurada:
+    conn = st.connection("gsheets", type=GSheetsConnection)
 # ----------------------------------------
   
 # URL oficial de compartilhamento da sua planilha do Google Sheets
@@ -80,15 +96,11 @@ MESES_PT = {
     9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'  
 }  
   
-# Estabelece a conexão usando as credenciais corrigidas dinamicamente
-conn = st.connection("gsheets", type=GSheetsConnection)
-
 def obter_nome_aba(data):  
     return MESES_PT[data.month]  
   
 def carregar_dados_mes(aba):  
     try:  
-        # Lê os dados da aba correspondente usando a API oficial do GSheets
         df = conn.read(spreadsheet=URL_PLANILHA, sheet=aba, ttl="0")  
         df = df.dropna(how='all')
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
