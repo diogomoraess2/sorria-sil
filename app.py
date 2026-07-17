@@ -168,67 +168,53 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# --- TÍTULO RESPONSIVO: MÊS EM LINHA SEPARADA E COMPENSAÇÃO DO EMOJI ---
+# --- TÍTULO RESPONSIVO: MÊS COM SELEÇÃO VIA POPOVER ---
+# 1. Criamos a área do título normalmente
 st.markdown(
     f"""
     <style>
-    .container-titulo {{
-        display: flex;
-        flex-direction: column; /* Empilha o título e o mês */
-        margin-bottom: 15px;
-    }}
-    .linha-superior {{
-        display: flex;
-        align-items: baseline;
-    }}
-    .titulo-principal {{
-        font-size: 42px;
-        font-weight: bold;
-        margin: 0;
-    }}
-    .emoji-dente {{
-        font-size: 2.5em;
-        margin-left: -8px; /* Ajuste para eliminar a margem do emoji */
-        margin-right: 10px; /* Compensação da margem */
-        line-height: 1;
-    }}
-    .linha-mes {{
-        margin-top: 5px;
+    .container-titulo {{ display: flex; flex-direction: column; margin-bottom: 15px; }}
+    .linha-superior {{ display: flex; align-items: baseline; }}
+    .titulo-principal {{ font-size: 42px; font-weight: bold; margin: 0; }}
+    .emoji-dente {{ font-size: 2.5em; margin-left: -8px; margin-right: 10px; line-height: 1; }}
+    
+    /* Estilo para o texto do Mês que agirá como botão */
+    .mes-clicavel {{
         font-size: 1.2em;
         font-weight: 300;
         color: #ffffff;
+        cursor: pointer; /* Indica que é clicável */
     }}
     .mes-neon {{
-        margin-left: 5px;
         font-weight: 500;
-        /* Efeito Neon mantido apenas no nome do mês */
         text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00e6ff, 0 0 30px #00e6ff;
     }}
-    
-    /* Ajuste responsivo para Celulares */
-    @media (max-width: 600px) {{
-        .linha-superior {{
-            font-size: 5.6vw;
-        }}
-        .emoji-dente {{
-            font-size: 2.2em;
-            margin-left: -5px; /* Ajuste proporcional no mobile */
-        }}
-    }}
     </style>
-    
+
     <div class="container-titulo">
         <div class="linha-superior">
             <span class="emoji-dente">🦷</span>
             <h1 class="titulo-principal">Sorria Sil</h1>
         </div>
-        <div class="linha-mes">
-            Mês: <span class="mes-neon">{nome_aba_trabalho}</span>
-        </div>
     </div>
     """, 
     unsafe_allow_html=True
 )
+
+# 2. Criamos o Popover no local onde o mês era exibido
+# O popover substitui o "painel administrativo" lateral
+with st.popover(label="Mês: " + nome_aba_trabalho, use_container_width=False):
+    # Aqui você coloca o seletor (selectbox, radio, etc)
+    novo_mes = st.selectbox("Selecione o mês:", ["Janeiro", "Fevereiro", "Março", "Julho"])
+    
+    # Lógica para atualizar o mês
+    if novo_mes != nome_aba_trabalho:
+        st.session_state['mes_atual'] = novo_mes
+        st.rerun()
+
+# Nota: O st.popover acima gera um botão padrão. 
+# Para ter o visual EXATO do seu texto com brilho sendo o botão, 
+# podemos usar st.button com CSS customizado ou manter o popover simples.
 # -------------------------------------------------------------------
   
 df_mes = carregar_dados_mes(nome_aba_trabalho)  
