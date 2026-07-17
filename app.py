@@ -13,22 +13,25 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  
 )  
 
-# Estilização CSS corrigida
+# Estilização CSS atualizada
 st.markdown("""  
     <style>  
-    /* Ajuste para dispositivos móveis: Título de ponta a ponta sem interferência de padding */
+    /* Ajuste para desktop (tamanho fixo) */
+    h1 { font-size: 48px !important; }
+
+    /* Ajuste para dispositivos móveis (focado em preencher a linha) */
     @media (max-width: 600px) {
         h1 { 
-            font-size: 11.5vw !important; 
+            font-size: 14vw !important; /* Tamanho maior para impacto */
             width: 100% !important; 
             text-align: center !important;
             display: block !important;
             white-space: nowrap !important;
             margin: 0 !important;
-            padding: 10px 0 !important; /* Padding apenas vertical */
+            padding: 15px 0 !important; 
             box-sizing: border-box !important; 
         }
-        .mes-neon { font-size: 22px !important; }
+        .mes-neon { font-size: 24px !important; }
     }
     .metric-box { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; margin-bottom: 10px; border-left: 6px solid; }  
     .metric-title { font-size: 11px; font-weight: bold; text-transform: uppercase; }  
