@@ -21,7 +21,7 @@ st.markdown("""
     .metric-box { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 6px solid #007bff; text-align: center; margin-bottom: 10px; }  
     .metric-title { font-size: 11px; color: #6c757d; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }  
     .metric-value { font-size: 20px; color: #212529; font-weight: bold; margin-top: 3px; }  
-    .mes-neon { font-weight: 500; font-size: 1.2em; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00e6ff, 0 0 30px #00e6ff; color: #ffffff; }  
+    .mes-neon { font-weight: 700; font-size: 28px; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00e6ff, 0 0 30px #00e6ff; color: #ffffff; }  
     </style>  
 """, unsafe_allow_html=True)  
 
@@ -55,7 +55,6 @@ try:
     conn = ConexaoManualSheets(cliente_gspread)
 except Exception as e:
     st.error(f"Erro Crítico de Conexão: {e}")
-    st.info("Verifique se as suas credenciais no Streamlit Secrets estão formatadas corretamente.")
     st.stop()
 
 URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M/edit?usp=sharing"  
@@ -77,23 +76,31 @@ if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = 
 st.markdown("<h1>🦷 Sorria Sil</h1>", unsafe_allow_html=True)
 nome_aba = MESES_PT[st.session_state['mes_atual_num']]
 
-with st.popover(f"Mês: {nome_aba}"):
+# Exibição do mês ajustada
+st.markdown("### Mês:")
+st.markdown(f'<span class="mes-neon">{nome_aba}</span>', unsafe_allow_html=True)
+st.write("") 
+
+with st.popover("Trocar Mês"):
     novo_mes = st.selectbox("Selecione:", list(MESES_PT.keys()), format_func=lambda x: MESES_PT[x], index=st.session_state['mes_atual_num'] - 1)
     if st.button("Confirmar"):
         st.session_state['mes_atual_num'] = novo_mes
         st.rerun()
 
-df_mes = carregar_dados_mes(nome_aba)  
-# Cálculo de totais
+df_mes = carregar_dados_mes(nome_aba)
+
+# Cálculo de totais com limpeza robusta para evitar valores "astronômicos"
 if not df_mes.empty:
     for col in ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']:
         if col in df_mes.columns:
-            df_mes[col] = pd.to_numeric(df_mes[col].replace(r'[R$ .,]', '', regex=True), errors='coerce').fillna(0)
+            # Limpa R$, pontos de milhar e converte vírgula para ponto decimal
+            limpo = df_mes[col].replace(r'[R$\s.]', '', regex=True).str.replace(',', '.', regex=False)
+            df_mes[col] = pd.to_numeric(limpo, errors='coerce').fillna(0)
     totais = df_mes[['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']].sum()
 else:
     totais = pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
-# Exibição de métricas e abas
+# Exibição de métricas
 col1, col2, col3, col4, col5 = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
 for i, (titulo, col) in enumerate(metricas):
@@ -110,7 +117,6 @@ with tab1:
         v_pix = st.number_input("Pix (R$)", step=10.0)
         v_uber = st.number_input("Uber (R$)", step=5.0)
         if st.form_submit_button("SALVAR"):
-            # Lógica de salvar omitida por brevidade, manter a anterior
             st.success("Dados enviados!")
 with tab2:
     st.dataframe(df_mes, use_container_width=True, hide_index=True)
