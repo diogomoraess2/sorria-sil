@@ -1,6 +1,6 @@
 import streamlit as st  
 import pandas as pd  
-import plotly.express as px # Import necessário para os gráficos
+import plotly.express as px
 from datetime import datetime  
 from google.oauth2.service_account import Credentials
 import gspread
@@ -131,16 +131,17 @@ with tab2:
     st.dataframe(df_mes, use_container_width=True, hide_index=True)
 
 with tab3:
+    st.subheader("Análise Financeira")
     if not df_mes.empty:
-        # Gráfico de Pizza (Dinheiro vs Pix vs Uber)
-        dados_pizza = {'Categoria': ['Dinheiro', 'Pix', 'Uber'], 
-                       'Valores': [totais['Dinheiro'], totais['Pix'], totais['Uber']]}
-        fig_pizza = px.pie(pd.DataFrame(dados_pizza), values='Valores', names='Categoria', title="Distribuição de Recebimentos")
+        # Gráfico de Pizza (incluindo o Próximo mês)
+        dados_pizza = {'Categoria': ['Dinheiro', 'Pix', 'Uber', 'A Receber'], 
+                       'Valores': [totais['Dinheiro'], totais['Pix'], totais['Uber'], totais['Próximo mês']]}
+        fig_pizza = px.pie(pd.DataFrame(dados_pizza), values='Valores', names='Categoria', title="Distribuição do Total")
         st.plotly_chart(fig_pizza, use_container_width=True)
         
         # Gráfico de Evolução (Linha)
         df_plot = df_mes.sort_values(by='Data')
-        fig_linha = px.line(df_plot, x='Data', y='Total', title='Evolução do Faturamento', markers=True)
+        fig_linha = px.line(df_plot, x='Data', y='Total', title='Evolução do Faturamento Total', markers=True)
         st.plotly_chart(fig_linha, use_container_width=True)
     else:
         st.info("Sem dados suficientes para gráficos neste mês.")
