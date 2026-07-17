@@ -168,29 +168,38 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# --- TÍTULO RESPONSIVO: ALINHAMENTO POR LINHA DE BASE (HORIZONTAIS) ---
+# --- TÍTULO RESPONSIVO: AJUSTE FINO DE ALINHAMENTO VERTICAL ---
 st.markdown(
     f"""
     <style>
     .container-titulo {{
         display: flex;
-        align-items: baseline; /* Alinha todos os itens pela base das letras */
-        white-space: nowrap;   /* Proíbe quebra de linha */
+        align-items: center; /* Centraliza verticalmente o dente com a frase */
+        white-space: nowrap;
         margin-bottom: 15px;
+        overflow: hidden;
     }}
     .titulo-principal {{
         font-size: 42px;
         font-weight: bold;
         margin: 0;
         display: flex;
-        align-items: baseline; /* Alinha o texto, pipeline e mês pela base */
+        align-items: center;
     }}
     .emoji-dente {{
-        font-size: 2.5em;      /* Dente grande */
+        font-size: 2.5em; 
         margin-right: 15px;
+        line-height: 1;
+    }}
+    .bloco-extra {{
+        display: flex;
+        align-items: center;
+        position: relative;
+        top: -3px; /* Sobe levemente o pipeline e o mês para alinhar ao centro visual */
+        margin-left: 10px;
     }}
     .mes-reduzido {{
-        font-size: 0.55em;     /* Mês menor */
+        font-size: 0.55em; 
         font-weight: 300;
         color: #6c757d;
         margin-left: 10px;
@@ -208,6 +217,9 @@ st.markdown(
             font-size: 2.2em; 
             margin-right: 8px;
         }}
+        .bloco-extra {{
+            top: -2px; /* Ajuste fino também no mobile */
+        }}
     }}
     </style>
     
@@ -215,8 +227,10 @@ st.markdown(
         <span class="emoji-dente">🦷</span>
         <h1 class="titulo-principal">
             Sorria Sil 
-            <span style="font-weight: 300; font-size: 0.7em; margin-left: 10px;">|</span> 
-            <span class="mes-reduzido">{nome_aba_trabalho}</span>
+            <span class="bloco-extra">
+                <span style="font-weight: 300; font-size: 0.7em;">|</span> 
+                <span class="mes-reduzido">{nome_aba_trabalho}</span>
+            </span>
         </h1>
     </div>
     """, 
