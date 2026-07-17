@@ -48,9 +48,9 @@ st.markdown("""
         color: #ffffff; 
     }
 
-    /* Ajuste de cor para Modo Claro */
+    /* Ajuste forçado de cor para Modo Claro */
     @media (prefers-color-scheme: light) {
-        .mes-neon { 
+        .mes-neon, .mes-neon span { 
             color: #8A2BE2 !important; 
         }
     }
