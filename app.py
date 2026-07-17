@@ -48,10 +48,12 @@ st.markdown("""
         color: #ffffff; 
     }
 
-    /* Ajuste forçado de cor para Modo Claro */
+    /* Ajuste para Modo Claro: Mantém o estilo, mas troca a cor e o brilho para Lilás */
     @media (prefers-color-scheme: light) {
-        .mes-neon, .mes-neon span { 
+        .mes-neon { 
             color: #8A2BE2 !important; 
+            /* Brilho ajustado para lilás para não "branquear" o texto */
+            text-shadow: 0 0 5px #8A2BE2, 0 0 10px #8A2BE2, 0 0 20px #8A2BE2 !important; 
         }
     }
     
