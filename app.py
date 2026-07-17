@@ -168,41 +168,47 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# --- TÍTULO RESPONSIVO EM LINHA ÚNICA (DESKTOP E MOBILE ULTRA CALIBRADO) ---
+# --- TÍTULO RESPONSIVO CALIBRADO: EMOJI PROPORCIONAL E ALINHAMENTO CENTRAL ---
 st.markdown(
     f"""
     <style>
-    /* Estilo padrão para Computador (Desktop) */
+    .container-titulo {{
+        display: flex;
+        align-items: center; /* Centraliza verticalmente o emoji, o texto e o mês */
+        white-space: nowrap;
+        margin-bottom: 15px;
+    }}
     .titulo-responsivo {{
         font-size: 42px;
         font-weight: bold;
-        margin-bottom: 15px;
-        white-space: nowrap; /* Impede a quebra de linha de qualquer forma */
-        overflow: hidden;
+        margin: 0;
     }}
     .emoji-dente {{
-        font-size: 0.9em;
+        font-size: 1em; /* Altura relativa à altura da fonte do título */
+        margin-right: 8px;
     }}
     
-    /* Ajuste responsivo ultra calibrado para Celulares */
+    /* Ajuste responsivo para Celulares */
     @media (max-width: 600px) {{
+        .container-titulo {{
+            margin-left: -10px;
+        }}
         .titulo-responsivo {{
-            /* Encolhe o texto sutilmente e ganha espaço nas laterais */
-            font-size: 5.8vw; 
-            margin-bottom: 10px;
-            margin-left: -12px; /* Empurra o título para a esquerda para ganhar espaço útil */
-            text-align: left;
+            font-size: 5.6vw; /* Ajustado para caber todo o conteúdo em uma linha */
         }}
         .emoji-dente {{
-            font-size: 5vw; /* Reduz o dente no celular para sobrar mais tela para as letras */
-            margin-right: 2px;
+            font-size: 1.1em; /* Ligeiramente maior que a altura da letra para destaque */
+            margin-right: 6px;
         }}
     }}
     </style>
     
-    <h1 class="titulo-responsivo">
-        <span class="emoji-dente">🦷</span>Sorria Sil <span style="color: #6c757d; font-weight: 300;">|</span> {nome_aba_trabalho}
-    </h1>
+    <div class="container-titulo">
+        <span class="emoji-dente">🦷</span>
+        <h1 class="titulo-responsivo">
+            Sorria Sil <span style="color: #6c757d; font-weight: 300;">|</span> {nome_aba_trabalho}
+        </h1>
+    </div>
     """, 
     unsafe_allow_html=True
 )
