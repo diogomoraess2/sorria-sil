@@ -187,7 +187,19 @@ df_mes = carregar_dados_mes(nome_aba_trabalho)
 if not df_mes.empty:  
     for col in ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']:
         if col in df_mes.columns:
-            df_mes[col] = pd.to_numeric(df_mes[col], errors='coerce').fillna(0.0)
+            # 1. Garante que os dados sejam tratados como texto para podermos limpá-los[cite: 1]
+            valores_limpos = df_mes[col].astype(str)
+            
+            # 2. Remove "R$", espaços, pontos de milhar e troca a vírgula decimal por ponto[cite: 1]
+            valores_limpos = (
+                valores_limpos.str.replace("R$", "", regex=False)
+                .str.replace(" ", "", regex=False)
+                .str.replace(".", "", regex=False)  # Remove ponto de milhar (ex: 1.000 -> 1000)[cite: 1]
+                .str.replace(",", ".", regex=False)  # Troca vírgula por ponto (ex: 150,50 -> 150.50)[cite: 1]
+            )
+            
+            # 3. Converte com segurança para numérico[cite: 1]
+            df_mes[col] = pd.to_numeric(valores_limpos, errors='coerce').fillna(0.0)
     
     total_geral = df_mes['Total'].sum() if 'Total' in df_mes.columns else 0.0
     total_dinheiro = df_mes['Dinheiro'].sum() if 'Dinheiro' in df_mes.columns else 0.0
