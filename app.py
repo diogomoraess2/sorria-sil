@@ -168,7 +168,7 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# --- TÍTULO RESPONSIVO: EMOJI EM TAMANHO MÁXIMO E MÊS OTIMIZADO ---
+# --- TÍTULO RESPONSIVO: EMOJI DESTAQUE MÁXIMO E ALINHAMENTO CENTRAL ---
 st.markdown(
     f"""
     <style>
@@ -184,15 +184,15 @@ st.markdown(
         font-weight: bold;
         margin: 0;
         display: flex;
-        align-items: center;
+        align-items: center; /* Centraliza o texto verticalmente com o emoji */
     }}
     .emoji-dente {{
-        font-size: 2em; /* Dente ampliado para o tamanho máximo possível */
+        font-size: 2.5em; /* Dente ainda maior para máximo impacto */
         margin-right: 15px;
-        line-height: 1;
+        line-height: 0.8; /* Ajuste fino para o centro do dente bater com o centro do texto */
     }}
     .mes-reduzido {{
-        font-size: 0.6em; /* Mês bem compacto para ceder espaço ao dente grande */
+        font-size: 0.55em; /* Nome do mês mais compacto para ceder espaço ao dente gigante */
         font-weight: 300;
         color: #6c757d;
         margin-left: 8px;
@@ -205,11 +205,11 @@ st.markdown(
             margin-left: -5px;
         }}
         .titulo-principal {{
-            font-size: 5.8vw; /* Ajustado para acomodar o emoji maior */
+            font-size: 5.6vw; /* Ajustado para acomodar o emoji gigante */
         }}
         .emoji-dente {{
-            font-size: 1.8em; /* Dente grande mantendo a proporção no mobile */
-            margin-right: 10px;
+            font-size: 2.2em; /* Mantém dente bem grande no mobile */
+            margin-right: 8px;
         }}
     }}
     </style>
@@ -224,7 +224,7 @@ st.markdown(
     """, 
     unsafe_allow_html=True
 )
-# -------------------------------------------------------------------  
+# -------------------------------------------------------------------
   
 df_mes = carregar_dados_mes(nome_aba_trabalho)  
   
