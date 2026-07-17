@@ -168,7 +168,7 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# --- TÍTULO RESPONSIVO EM LINHA ÚNICA (DESKTOP E MOBILE CALIBRADO) ---
+# --- TÍTULO RESPONSIVO EM LINHA ÚNICA (DESKTOP E MOBILE ULTRA CALIBRADO) ---
 st.markdown(
     f"""
     <style>
@@ -180,25 +180,33 @@ st.markdown(
         white-space: nowrap; /* Impede a quebra de linha de qualquer forma */
         overflow: hidden;
     }}
+    .emoji-dente {{
+        font-size: 0.9em;
+    }}
     
-    /* Ajuste responsivo calibrado para Celulares */
+    /* Ajuste responsivo ultra calibrado para Celulares */
     @media (max-width: 600px) {{
         .titulo-responsivo {{
-            /* Reduzido para 6.2vw para garantir folga nas bordas da tela */
-            font-size: 6.2vw; 
+            /* Encolhe o texto sutilmente e ganha espaço nas laterais */
+            font-size: 5.8vw; 
             margin-bottom: 10px;
+            margin-left: -12px; /* Empurra o título para a esquerda para ganhar espaço útil */
             text-align: left;
+        }}
+        .emoji-dente {{
+            font-size: 5vw; /* Reduz o dente no celular para sobrar mais tela para as letras */
+            margin-right: 2px;
         }}
     }}
     </style>
     
     <h1 class="titulo-responsivo">
-        <span style="font-size: 0.9em;">🦷</span> Sorria Sil <span style="color: #6c757d; font-weight: 300;">|</span> {nome_aba_trabalho}
+        <span class="emoji-dente">🦷</span>Sorria Sil <span style="color: #6c757d; font-weight: 300;">|</span> {nome_aba_trabalho}
     </h1>
     """, 
     unsafe_allow_html=True
 )
-# -----------------------------------------------------------  
+# ---------------------------------------------------------------------------  
   
 df_mes = carregar_dados_mes(nome_aba_trabalho)  
   
