@@ -5,7 +5,12 @@ from google.oauth2.service_account import Credentials
 import gspread
 
 # Configuração da página
-st.set_page_config(page_title="Controle Financeiro - Sorria Sil", layout="wide", initial_sidebar_state="collapsed")  
+st.set_page_config(  
+    page_title="Controle Financeiro - Sorria Sil",  
+    page_icon="🦷",  
+    layout="wide",  
+    initial_sidebar_state="collapsed"  
+)  
 
 # Estilização CSS
 st.markdown("""  
@@ -18,17 +23,49 @@ st.markdown("""
 """, unsafe_allow_html=True)  
 
 # --- CONEXÃO ---
-# (Manter sua classe e try/except de conexão aqui)
+class ConexaoManualSheets:
+    def __init__(self, client):
+        self.client = client
+    def read(self, spreadsheet, sheet):
+        sh = self.client.open_by_url(spreadsheet)
+        worksheet = sh.worksheet(sheet)
+        return pd.DataFrame(worksheet.get_all_records())
 
+try:
+    if "connections" not in st.secrets or "gsheets" not in st.secrets["connections"]:
+        st.stop()
+        
+    creds_dict = dict(st.secrets["connections"]["gsheets"])
+    if "private_key" in creds_dict:
+        creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+        
+    escopos = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+    credenciais_google = Credentials.from_service_account_info(creds_dict, scopes=escopos)
+    cliente_gspread = gspread.authorize(credenciais_google)
+    conn = ConexaoManualSheets(cliente_gspread)
+except Exception:
+    st.stop()
+
+URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M/edit?usp=sharing"  
 MESES_PT = {1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto', 9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'}  
-
+  
+def carregar_dados_mes(aba):  
+    try:  
+        df = conn.read(spreadsheet=URL_PLANILHA, sheet=aba)  
+        df = df.dropna(how='all')
+        if not df.empty and 'Data' in df.columns:
+            df['Data'] = pd.to_datetime(df['Data'], dayfirst=True, errors='coerce').dt.date  
+            return df.dropna(subset=['Data'])
+    except: pass  
+    return pd.DataFrame(columns=['Data', 'Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])  
+  
 # --- INTERFACE ---
 if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = datetime.today().month
 if 'editando_mes' not in st.session_state: st.session_state['editando_mes'] = False
 
 st.markdown("<h1>🦷 Sorria Sil</h1>", unsafe_allow_html=True)
 
-# Título do Mês separado e Neon
+# Exibição do Mês
 st.markdown("### Mês:")
 st.markdown(f'<span class="mes-neon">{MESES_PT[st.session_state["mes_atual_num"]]}</span>', unsafe_allow_html=True)
 st.write("") 
@@ -54,5 +91,35 @@ else:
         st.session_state['editando_mes'] = False
         st.rerun()
 
-# --- CÁLCULO E DEMAIS COMPONENTES ---
-# (Continue com a sua lógica de carregar_dados_mes, colunas e tabs abaixo)
+df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
+
+# Cálculo de totais
+if not df_mes.empty:
+    for col in ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']:
+        if col in df_mes.columns:
+            limpo = df_mes[col].replace(r'[R$\s.]', '', regex=True).str.replace(',', '.', regex=False)
+            df_mes[col] = pd.to_numeric(limpo, errors='coerce').fillna(0)
+    totais = df_mes[['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']].sum()
+else:
+    totais = pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
+
+# Métricas
+col1, col2, col3, col4, col5 = st.columns(5)
+metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
+for i, (titulo, col) in enumerate(metricas):
+    with locals()[f'col{i+1}']:
+        st.markdown(f'<div class="metric-box"><div class="metric-title">{titulo}</div><div class="metric-value">R$ {totais[col]:,.2f}</div></div>', unsafe_allow_html=True)
+
+st.markdown("---")
+tab1, tab2 = st.tabs(["📝 Lançar", "📋 Dados"])
+with tab1:
+    with st.form("form_registro", clear_on_submit=True):
+        st.date_input("Data")
+        st.number_input("Total (R$)", step=10.0)
+        st.number_input("Dinheiro (R$)", step=10.0)
+        st.number_input("Pix (R$)", step=10.0)
+        st.number_input("Uber (R$)", step=5.0)
+        if st.form_submit_button("SALVAR"):
+            st.success("Dados enviados!")
+with tab2:
+    st.dataframe(df_mes, use_container_width=True, hide_index=True)
