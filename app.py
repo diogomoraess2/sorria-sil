@@ -168,24 +168,26 @@ hoje = datetime.today()
 mes_selecionado_num = st.sidebar.selectbox("Mês de Visualização", list(MESES_PT.keys()), index=hoje.month - 1)  
 nome_aba_trabalho = MESES_PT[mes_selecionado_num]  
   
-# --- TÍTULO RESPONSIVO CALIBRADO: EMOJI PROPORCIONAL E ALINHAMENTO CENTRAL ---
+# --- TÍTULO RESPONSIVO: PROPORÇÕES OTIMIZADAS PARA UMA LINHA ---
 st.markdown(
     f"""
     <style>
     .container-titulo {{
         display: flex;
-        align-items: center; /* Centraliza verticalmente o emoji, o texto e o mês */
-        white-space: nowrap;
+        align-items: center; /* Centraliza tudo verticalmente na linha */
+        white-space: nowrap; /* Trava tudo em uma linha só */
         margin-bottom: 15px;
     }}
-    .titulo-responsivo {{
+    .titulo-principal {{
         font-size: 42px;
         font-weight: bold;
         margin: 0;
     }}
-    .emoji-dente {{
-        font-size: 1em; /* Altura relativa à altura da fonte do título */
-        margin-right: 8px;
+    .mes-reduzido {{
+        font-size: 0.75em; /* Nome do mês menor que o título principal */
+        font-weight: 300;
+        color: #6c757d;
+        margin-left: 8px;
     }}
     
     /* Ajuste responsivo para Celulares */
@@ -193,11 +195,11 @@ st.markdown(
         .container-titulo {{
             margin-left: -10px;
         }}
-        .titulo-responsivo {{
-            font-size: 5.6vw; /* Ajustado para caber todo o conteúdo em uma linha */
+        .titulo-principal {{
+            font-size: 6.2vw; /* Ajustado para caber todo o conteúdo em uma linha */
         }}
         .emoji-dente {{
-            font-size: 1.1em; /* Ligeiramente maior que a altura da letra para destaque */
+            font-size: 1em; /* Tamanho proporcional à frase Sorria Sil */
             margin-right: 6px;
         }}
     }}
@@ -205,8 +207,9 @@ st.markdown(
     
     <div class="container-titulo">
         <span class="emoji-dente">🦷</span>
-        <h1 class="titulo-responsivo">
-            Sorria Sil <span style="color: #6c757d; font-weight: 300;">|</span> {nome_aba_trabalho}
+        <h1 class="titulo-principal">
+            Sorria Sil <span style="font-weight: 300;">|</span> 
+            <span class="mes-reduzido">{nome_aba_trabalho}</span>
         </h1>
     </div>
     """, 
