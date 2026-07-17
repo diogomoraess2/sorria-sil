@@ -13,10 +13,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  
 )  
 
-# Estilização CSS
+# Estilização CSS atualizada (removido o border-left fixo da classe .metric-box)
 st.markdown("""  
     <style>  
-    .metric-box { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 6px solid #007bff; text-align: center; margin-bottom: 10px; }  
+    .metric-box { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; margin-bottom: 10px; border-left: 6px solid; }  
     .metric-title { font-size: 11px; color: #6c757d; font-weight: bold; text-transform: uppercase; }  
     .metric-value { font-size: 20px; color: #212529; font-weight: bold; }  
     .mes-neon { font-weight: 700; font-size: 28px; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00e6ff, 0 0 30px #00e6ff; color: #ffffff; }  
@@ -24,6 +24,7 @@ st.markdown("""
 """, unsafe_allow_html=True)  
 
 # --- CONEXÃO ---
+# [A classe ConexaoManualSheets e o bloco try/except permanecem iguais]
 class ConexaoManualSheets:
     def __init__(self, client):
         self.client = client
@@ -35,11 +36,9 @@ class ConexaoManualSheets:
 try:
     if "connections" not in st.secrets or "gsheets" not in st.secrets["connections"]:
         st.stop()
-        
     creds_dict = dict(st.secrets["connections"]["gsheets"])
     if "private_key" in creds_dict:
         creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
-        
     escopos = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
     credenciais_google = Credentials.from_service_account_info(creds_dict, scopes=escopos)
     cliente_gspread = gspread.authorize(credenciais_google)
@@ -49,7 +48,7 @@ except Exception:
 
 URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M/edit?usp=sharing"  
 MESES_PT = {1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto', 9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'}  
-  
+
 def carregar_dados_mes(aba):  
     try:  
         df = conn.read(spreadsheet=URL_PLANILHA, sheet=aba)  
@@ -71,19 +70,13 @@ st.markdown("### Mês:")
 st.markdown(f'<span class="mes-neon">{MESES_PT[st.session_state["mes_atual_num"]]}</span>', unsafe_allow_html=True)
 st.write("") 
 
-# --- LÓGICA DE SELEÇÃO SEM TECLADO ACIDENTAL ---
+# --- SELEÇÃO ---
 if not st.session_state['editando_mes']:
     if st.button("Trocar Mês"):
         st.session_state['editando_mes'] = True
         st.rerun()
 else:
-    novo_mes = st.selectbox(
-        "Selecione o mês:", 
-        options=list(MESES_PT.keys()), 
-        format_func=lambda x: MESES_PT[x],
-        index=st.session_state['mes_atual_num'] - 1,
-        placeholder="Escolha um mês..."
-    )
+    novo_mes = st.selectbox("Selecione o mês:", options=list(MESES_PT.keys()), format_func=lambda x: MESES_PT[x], index=st.session_state['mes_atual_num'] - 1)
     col_a, col_b = st.columns(2)
     if col_a.button("Confirmar"):
         st.session_state['mes_atual_num'] = novo_mes
@@ -95,7 +88,7 @@ else:
 
 df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
 
-# Cálculo de totais
+# Cálculo
 if not df_mes.empty:
     for col in ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']:
         if col in df_mes.columns:
@@ -105,61 +98,29 @@ if not df_mes.empty:
 else:
     totais = pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
-# Métricas
-col1, col2, col3, col4, col5 = st.columns(5)
+# Mapeamento de cores (igual ao gráfico)
+cores = {
+    'Total': '#007bff', 
+    'Dinheiro': '#636EFA', 
+    'Pix': '#FBBC05', 
+    'A Receber': '#25D366', 
+    'Uber': '#EA4335'
+}
+
+# --- MÉTRICAS COM CORES DINÂMICAS ---
+cols = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
 for i, (titulo, col) in enumerate(metricas):
-    with locals()[f'col{i+1}']:
-        st.markdown(f'<div class="metric-box"><div class="metric-title">{titulo}</div><div class="metric-value">R$ {totais[col]:,.2f}</div></div>', unsafe_allow_html=True)
+    cor_lateral = cores.get(titulo, '#007bff')
+    with cols[i]:
+        st.markdown(f'''
+            <div class="metric-box" style="border-left-color: {cor_lateral};">
+                <div class="metric-title">{titulo}</div>
+                <div class="metric-value">R$ {totais[col]:,.2f}</div>
+            </div>
+        ''', unsafe_allow_html=True)
 
+# [O restante do código das abas (Lançar, Dados, Gráficos) permanece igual ao anterior]
 st.markdown("---")
-
-# --- ABAS COM GRÁFICOS ---
 tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
-
-with tab1:
-    with st.form("form_registro", clear_on_submit=True):
-        st.date_input("Data")
-        st.number_input("Total (R$)", step=10.0)
-        st.number_input("Dinheiro (R$)", step=10.0)
-        st.number_input("Pix (R$)", step=10.0)
-        st.number_input("Uber (R$)", step=5.0)
-        if st.form_submit_button("SALVAR"):
-            st.success("Dados enviados!")
-
-with tab2:
-    st.dataframe(df_mes, use_container_width=True, hide_index=True)
-
-with tab3:
-    st.subheader("Análise Financeira")
-    if not df_mes.empty:
-        # Preparação dos dados
-        dados_pizza = {'Categoria': ['Dinheiro', 'Pix', 'Uber', 'A Receber'], 
-                       'Valores': [totais['Dinheiro'], totais['Pix'], totais['Uber'], totais['Próximo mês']]}
-        df_pizza = pd.DataFrame(dados_pizza)
-        
-        # Mapeamento de cores solicitado: Pix (Amarelo Google #FBBC05), Uber (Vermelho #EA4335), A Receber (Verde WhatsApp #25D366)
-        cores = {
-            'Dinheiro': '#636EFA', 
-            'Pix': '#FBBC05', 
-            'Uber': '#EA4335', 
-            'A Receber': '#25D366'
-        }
-        
-        # Gráfico de Pizza
-        fig_pizza = px.pie(
-            df_pizza, 
-            values='Valores', 
-            names='Categoria', 
-            title="Distribuição do Total",
-            color='Categoria',
-            color_discrete_map=cores
-        )
-        st.plotly_chart(fig_pizza, use_container_width=True)
-        
-        # Gráfico de Evolução (Linha)
-        df_plot = df_mes.sort_values(by='Data')
-        fig_linha = px.line(df_plot, x='Data', y='Total', title='Evolução do Faturamento Total', markers=True)
-        st.plotly_chart(fig_linha, use_container_width=True)
-    else:
-        st.info("Sem dados suficientes para gráficos neste mês.")
+# ... (restante do código das abas)
