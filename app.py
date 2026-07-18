@@ -4,7 +4,6 @@ import plotly.express as px
 from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
-from oauth2client.service_account import ServiceAccountCredentials
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(
@@ -36,16 +35,15 @@ class ConexaoManualSheets:
 @st.cache_resource
 def get_connection():
     try:
-        if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
-            creds_dict = dict(st.secrets["connections"]["gsheets"])
-            if "private_key" in creds_dict:
-                creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
-            creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPE)
-        else:
-            creds = ServiceAccountCredentials.from_json_keyfile_name('service_account.json', SCOPE)
+        # Tenta carregar as credenciais a partir dos secrets do Streamlit Cloud
+        creds_dict = dict(st.secrets["connections"]["gsheets"])
+        if "private_key" in creds_dict:
+            creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+        
+        creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPE)
         return ConexaoManualSheets(gspread.authorize(creds))
     except Exception as e:
-        st.error(f"Erro de conexão: {e}")
+        st.error(f"Erro ao autenticar: {e}")
         return None
 
 conn = get_connection()
