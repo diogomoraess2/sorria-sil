@@ -46,7 +46,7 @@ def get_connection():
 
 conn = get_connection()
 
-# --- CSS E VARIÁVEIS ---
+# --- CSS ---
 st.markdown("""
     <style>
     h1 { font-size: 48px !important; }
@@ -66,6 +66,14 @@ def carregar_dados_mes(aba):
         df = df.dropna(how='all')
         if not df.empty and 'Data' in df.columns:
             df['Data'] = pd.to_datetime(df['Data'], dayfirst=True, errors='coerce').dt.date
+            
+            # Limpeza robusta: garante que colunas financeiras sejam números
+            for col in ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']:
+                if col in df.columns:
+                    # Remove R$, espaços, pontos de milhar e substitui vírgula por ponto
+                    df[col] = df[col].replace(r'[R$\s.]', '', regex=True).str.replace(',', '.')
+                    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+            
             return df.dropna(subset=['Data'])
     except: pass
     return pd.DataFrame(columns=['Data', 'Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
@@ -86,16 +94,8 @@ if st.session_state['editando_mes']:
         st.rerun()
 
 df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
-
-# --- CÁLCULO DE TOTAIS ---
 colunas_financeiras = ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']
-if not df_mes.empty:
-    for col in colunas_financeiras:
-        if col in df_mes.columns:
-            df_mes[col] = pd.to_numeric(df_mes[col], errors='coerce').fillna(0)
-    totais = df_mes[colunas_financeiras].sum()
-else:
-    totais = pd.Series(0, index=colunas_financeiras)
+totais = df_mes[colunas_financeiras].sum() if not df_mes.empty else pd.Series(0, index=colunas_financeiras)
 
 # --- EXIBIÇÃO DE MÉTRICAS ---
 cores = {'Total': '#007bff', 'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'Próximo mês': '#636EFA', 'Uber': '#EA4335'}
