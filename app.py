@@ -49,9 +49,35 @@ conn = get_connection()
 # --- CSS ---
 st.markdown("""
     <style>
+    /* Oculta o cabeçalho superior (menu, deploy, etc) */
+    [data-testid="stHeader"] {
+        display: none;
+    }
+    
+    /* Ajuste da margem superior do container principal */
+    .block-container { 
+        padding-top: 1rem !important; 
+    }
+    
     h1 { font-size: 48px !important; }
-    .mes-neon { font-weight: 700; font-size: 28px; text-shadow: 0 0 10px #00e6ff; color: #ffffff; }
-    .metric-box { background-color: #f8f9fa; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; margin: 10px 5px; border-left: 6px solid; }
+    
+    .mes-neon { 
+        font-weight: 700; 
+        font-size: 28px; 
+        text-shadow: 0 0 10px #00e6ff; 
+        color: #ffffff; 
+    }
+    
+    .metric-box { 
+        background-color: #f8f9fa; 
+        padding: 15px; 
+        border-radius: 12px; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        text-align: center; 
+        margin: 10px 5px; 
+        border-left: 6px solid; 
+    }
+    
     .metric-title { font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
     .metric-value { font-size: 20px; color: #212529; font-weight: bold; }
     </style>
