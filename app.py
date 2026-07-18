@@ -5,6 +5,7 @@ from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 import base64
+import streamlit.components.v1 as components
 
 # --- CONFIGURAÇÃO PWA ---
 manifest_json = """
@@ -33,30 +34,45 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- INJEÇÃO DE CSS (ESTILO EASYNOTES + BACKGROUND QUADRICULADO) ---
-
-st.markdown("""
-    
+# --- INJEÇÃO DE CSS E ESTILOS ---
+# O uso de components.html garante que o CSS seja aplicado globalmente
+components.html("""
 <style>
-    /* Aplica a imagem de fundo quadriculada */
+    /* Aplica a imagem de fundo quadriculada no container principal */
     .stApp {
         background-image: url('https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/quadro-verde.jpg');
         background-size: cover;
         background-attachment: fixed;
     }
     
+    /* Esconde elementos padrão do Streamlit */
     [data-testid="stHeader"], footer, #MainMenu, .stAppDeployButton, .viewerBadge_container__1QSob {
         display: none !important;
     }
-    .block-container { padding-top: 0.5rem !important; }
     
-    h1 { font-family: 'Segoe UI', sans-serif !important; margin-bottom: 20px !important; }
+    /* Configuração das Abas */
+    button[data-baseweb="tab"] {
+        color: #222222 !important;
+        font-weight: 600 !important;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] {
+        color: #f5a623 !important;
+    }
+    div[data-baseweb="tab-highlight"] {
+        background-color: #f5a623 !important;
+    }
+</style>
+""", height=0)
 
+# CSS adicional via Markdown para elementos de layout que o Streamlit permite
+st.markdown("""
+    <style>
+    .block-container { padding-top: 0.5rem !important; }
+    h1 { font-family: 'Segoe UI', sans-serif !important; margin-bottom: 20px !important; }
     .mes-clean { 
         font-weight: 600; font-size: 28px !important; 
         color: #333 !important; margin-bottom: 15px; display: block;
     }
-    
     .metric-card { 
         background-color: rgba(255, 255, 255, 0.85) !important; 
         padding: 15px; border-radius: 12px; 
@@ -67,30 +83,14 @@ st.markdown("""
     }
     .metric-title { font-size: 13px !important; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; color: #555 !important; }
     .metric-value { font-size: 22px !important; font-weight: 700; color: #222 !important; }
-    
     .stSelectbox label, .stDateInput label, .stNumberInput label, .stMarkdown p {
         color: #222222 !important; font-weight: 500;
     }
-
     div[data-baseweb="select"] > div {
         background-color: #f7fdf3 !important;
         border: 1px solid #d0e8d0 !important;
     }
-
-    /* FORÇANDO A COR DAS ABAS */
-    button[data-baseweb="tab"] {
-        color: #222222 !important;
-    }
-
-    button[aria-selected="true"] {
-        color: #f5a623 !important;
-    }
-
-    div[data-baseweb="tab-highlight"] {
-        background-color: #f5a623 !important;
-    }
     </style>
-
 """, unsafe_allow_html=True)
 
 st.markdown(f'<link rel="manifest" href="data:application/manifest+json;base64,{b64_manifest}">', unsafe_allow_html=True)
@@ -208,7 +208,6 @@ with tab3:
         fig = px.pie(values=valores_grafico, names=colunas_grafico, title="Distribuição de Receitas",
                      color=colunas_grafico, color_discrete_map=cores_map)
         
-        # Gráfico com tema claro e limpo
         fig.update_layout(template="plotly_white", margin=dict(t=40, b=0, l=0, r=0))
         st.plotly_chart(fig, use_container_width=True)
     else:
