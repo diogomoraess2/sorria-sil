@@ -5,6 +5,16 @@ from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 
+import streamlit as st
+
+# Injeção do PWA
+st.markdown("""
+    <link rel="manifest" href="https://sorria-sil-9xazpzd2ssqtmnfqnjx9fz.streamlit.app/static/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Sorria Sil">
+""", unsafe_allow_html=True)
+
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(
     page_title="Controle Financeiro - Sorria Sil",
