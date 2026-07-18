@@ -33,7 +33,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- INJEÇÃO DE CSS (ESTILO SUAVE E CUSTOMIZADO) ---
+# --- INJEÇÃO DE CSS (ESTILO SUAVE, SEM CONTROLES +/- E INPUTS CLAROS) ---
 st.markdown("""
     <style>
     .stApp {
@@ -63,7 +63,14 @@ st.markdown("""
         display: flex; flex-direction: column; align-items: center;
     }
     
-    /* Ajuste suave dos campos de entrada */
+    /* Remove os botões +/- do input numérico */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    
+    /* Estilo suave dos campos de entrada */
     div[data-baseweb="select"], div[data-baseweb="input"], div[data-baseweb="base-input"] {
         background-color: #ffffff !important;
         border: 1px solid #c8e6c9 !important;
@@ -72,25 +79,25 @@ st.markdown("""
     
     /* Botão de Salvar Suave */
     div.stButton > button {
-        background-color: #a8e0a8 !important; /* Verde suave */
+        background-color: #a8e0a8 !important; 
         color: #ffffff !important;
         border: none !important;
         border-radius: 8px !important;
         font-weight: 600 !important;
     }
     div.stButton > button:hover {
-        background-color: #8cc68c !important; /* Tom um pouco mais fechado no hover */
+        background-color: #8cc68c !important;
     }
 
     label { color: #222 !important; font-weight: 600 !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- CONFIGURAÇÃO DA API E RESTANTE DO CÓDIGO ---
-# (Mantive a lógica inalterada para garantir o funcionamento)
+# --- CONFIGURAÇÃO DA API ---
 SCOPE = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M/edit?usp=sharing"
 
+# --- LÓGICA MANTIDA ---
 class ConexaoManualSheets:
     def __init__(self, client):
         self.client = client
@@ -142,6 +149,7 @@ def carregar_dados_mes(aba):
 df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
 totais = df_mes[['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']].sum() if not df_mes.empty else pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
+# Métricas
 cols = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
 cores = {'Total': '#4a90e2', 'Dinheiro': '#7ed321', 'Pix': '#f5a623', 'Próximo mês': '#9013fe', 'Uber': '#d0021b'}
@@ -154,6 +162,7 @@ for i, (titulo, col) in enumerate(metricas):
             <div class="metric-value">{valor_formatado}</div>
             </div>''', unsafe_allow_html=True)
 
+# --- ABAS ---
 tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 
 with tab1:
