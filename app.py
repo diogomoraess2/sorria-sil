@@ -5,17 +5,38 @@ from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 
+import base64
 import streamlit as st
 
-# Injeção do PWA
-st.markdown("""
-    <link rel="manifest" href="static/manifest.json">
+# Define o seu manifesto como uma string
+manifest_json = """
+{
+  "name": "Sorria Sil",
+  "short_name": "Sorria Sil",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#00e6ff",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3062/3062634.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+"""
+# Codifica para base64
+b64_manifest = base64.b64encode(manifest_json.encode()).decode()
+
+# Injeta diretamente no HTML
+st.markdown(f"""
+    <link rel="manifest" href="data:application/manifest+json;base64,{b64_manifest}">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Sorria Sil">
 """, unsafe_allow_html=True)
-
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(
     page_title="Controle Financeiro - Sorria Sil",
