@@ -49,7 +49,7 @@ st.markdown("""
         margin-bottom: 20px; display: block;
     }
     .metric-card { 
-        background-color: #f8f9fa; padding: 10px; border-radius: 12px; 
+        background-color: #f8f9fa; padding: 8px; border-radius: 12px; 
         box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; 
         margin-bottom: 15px; border-left: 8px solid; 
         display: flex; flex-direction: column; align-items: center;
