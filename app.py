@@ -33,7 +33,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- INJEÇÃO DE CSS (ESTILO EASYNOTES + BACKGROUND QUADRICULADO) ---
+# --- INJEÇÃO DE CSS (FORÇANDO ESTILO CLARO) ---
 st.markdown("""
     <style>
     /* Aplica a imagem de fundo quadriculada */
@@ -57,7 +57,7 @@ st.markdown("""
         color: #333 !important; margin-bottom: 15px; display: block;
     }
     
-    /* Cards estilo EasyNotes com transparência */
+    /* Cards estilo EasyNotes */
     .metric-card { 
         background-color: rgba(255, 255, 255, 0.85) !important; 
         padding: 15px; border-radius: 12px; 
@@ -66,26 +66,22 @@ st.markdown("""
         border-left: 6px solid; 
         display: flex; flex-direction: column; align-items: center;
     }
-    .metric-title { 
-        font-size: 13px !important; font-weight: 700; text-transform: uppercase; 
-        margin-bottom: 5px; color: #555 !important; 
-    }
+    .metric-title { font-size: 13px !important; font-weight: 700; color: #555 !important; }
     .metric-value { font-size: 22px !important; font-weight: 700; color: #222 !important; }
     
-    /* Ajuste da Selectbox harmonizada */
-    div[data-baseweb="select"] {
-        background-color: rgba(255, 255, 255, 0.8) !important;
+    /* FORÇANDO ESTILO CLARO NAS ENTRADAS DE DADOS */
+    div[data-baseweb="select"], div[data-baseweb="input"], div[data-baseweb="base-input"] {
+        background-color: #ffffff !important;
         border: 1px solid #c8e6c9 !important;
-        border-radius: 10px !important;
-    }
-    div[data-baseweb="select"] > div {
-        color: #555 !important;
+        border-radius: 8px !important;
     }
     
-    /* Ajuste de labels e textos */
-    .stSelectbox label, .stDateInput label, .stNumberInput label, .stMarkdown p {
-        color: #222 !important; font-weight: 500;
+    input, div[role="combobox"] {
+        background-color: #ffffff !important;
+        color: #333 !important;
     }
+    
+    label, p { color: #222 !important; font-weight: 600 !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -152,16 +148,10 @@ def carregar_dados_mes(aba):
 df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
 totais = df_mes[['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']].sum() if not df_mes.empty else pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
-# Métricas com Cores Estilo EasyNotes
+# Métricas
 cols = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
-cores = {
-    'Total': '#4a90e2', 
-    'Dinheiro': '#7ed321', 
-    'Pix': '#f5a623', 
-    'Próximo mês': '#9013fe', 
-    'Uber': '#d0021b'
-}
+cores = {'Total': '#4a90e2', 'Dinheiro': '#7ed321', 'Pix': '#f5a623', 'Próximo mês': '#9013fe', 'Uber': '#d0021b'}
 
 for i, (titulo, col) in enumerate(metricas):
     with cols[i]:
@@ -200,11 +190,8 @@ with tab3:
         colunas_grafico = ['Dinheiro', 'Pix', 'Uber', 'Próximo mês']
         valores_grafico = totais[colunas_grafico]
         cores_map = {'Dinheiro': '#7ed321', 'Pix': '#f5a623', 'Uber': '#d0021b', 'Próximo mês': '#9013fe'}
-        
         fig = px.pie(values=valores_grafico, names=colunas_grafico, title="Distribuição de Receitas",
                      color=colunas_grafico, color_discrete_map=cores_map)
-        
-        # Gráfico com tema claro e limpo
         fig.update_layout(template="plotly_white", margin=dict(t=40, b=0, l=0, r=0))
         st.plotly_chart(fig, use_container_width=True)
     else:
