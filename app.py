@@ -33,11 +33,15 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- INJEÇÃO DE CSS (ESTILO EASYNOTES) ---
+# --- INJEÇÃO DE CSS (ESTILO EASYNOTES + BACKGROUND QUADRICULADO) ---
 st.markdown("""
     <style>
-    /* Fundo suave estilo EasyNotes */
-    .stApp { background-color: #fdfdfd; }
+    /* Aplica a imagem de fundo quadriculada */
+    .stApp {
+        background-image: url('https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/quadro-verde.jpg');
+        background-size: cover;
+        background-attachment: fixed;
+    }
     
     [data-testid="stHeader"], footer, #MainMenu, .stAppDeployButton, .viewerBadge_container__1QSob {
         display: none !important;
@@ -50,27 +54,27 @@ st.markdown("""
     /* Estilo de texto do mês */
     .mes-clean { 
         font-weight: 600; font-size: 28px !important; 
-        color: #4a4a4a !important; margin-bottom: 15px; display: block;
+        color: #333 !important; margin-bottom: 15px; display: block;
     }
     
-    /* Cards estilo EasyNotes */
+    /* Cards estilo EasyNotes com transparência */
     .metric-card { 
-        background-color: #ffffff !important; 
+        background-color: rgba(255, 255, 255, 0.85) !important; 
         padding: 15px; border-radius: 12px; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.08); text-align: center; 
-        border: 1px solid #e0e0e0;
+        border: 1px solid #d0e8d0;
         border-left: 6px solid; 
         display: flex; flex-direction: column; align-items: center;
     }
     .metric-title { 
         font-size: 13px !important; font-weight: 700; text-transform: uppercase; 
-        margin-bottom: 5px; color: #757575 !important; 
+        margin-bottom: 5px; color: #555 !important; 
     }
-    .metric-value { font-size: 22px !important; font-weight: 700; color: #333 !important; }
+    .metric-value { font-size: 22px !important; font-weight: 700; color: #222 !important; }
     
-    /* Ajuste de labels */
+    /* Ajuste de labels e textos */
     .stSelectbox label, .stDateInput label, .stNumberInput label, .stMarkdown p {
-        color: #333 !important;
+        color: #222 !important; font-weight: 500;
     }
     </style>
 """, unsafe_allow_html=True)
