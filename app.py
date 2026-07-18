@@ -145,7 +145,21 @@ with tab1:
                 st.warning("Por favor, preencha pelo menos o campo Total.")
 
 with tab2:
-    st.dataframe(df_mes, use_container_width=True, hide_index=True)
+    with tab2:
+    if not df_mes.empty:
+        # Criamos uma cópia para não alterar os cálculos (que precisam ser números)
+        df_exibicao = df_mes.copy()
+        
+        # Formata colunas financeiras como moeda R$
+        colunas_financeiras = ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']
+        for col in colunas_financeiras:
+            if col in df_exibicao.columns:
+                # O format abaixo coloca o R$ e duas casas decimais
+                df_exibicao[col] = df_exibicao[col].apply(lambda x: f"R$ {x:,.2f}")
+        
+        st.dataframe(df_exibicao, use_container_width=True, hide_index=True)
+    else:
+        st.info("Nenhum dado lançado para este mês.")
 
 with tab3:
     if not df_mes.empty:
