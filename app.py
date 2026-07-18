@@ -72,6 +72,16 @@ st.markdown("""
     }
     .metric-value { font-size: 22px !important; font-weight: 700; color: #222 !important; }
     
+    /* Ajuste da Selectbox harmonizada */
+    div[data-baseweb="select"] {
+        background-color: rgba(255, 255, 255, 0.8) !important;
+        border: 1px solid #c8e6c9 !important;
+        border-radius: 10px !important;
+    }
+    div[data-baseweb="select"] > div {
+        color: #555 !important;
+    }
+    
     /* Ajuste de labels e textos */
     .stSelectbox label, .stDateInput label, .stNumberInput label, .stMarkdown p {
         color: #222 !important; font-weight: 500;
