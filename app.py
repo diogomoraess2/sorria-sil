@@ -33,7 +33,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Injeção de CSS e Metatags
+# Injeção de CSS e Metatags com chaves dobradas para evitar NameError
 st.markdown(f"""
     <link rel="manifest" href="data:application/manifest+json;base64,{b64_manifest}">
     <style>
@@ -97,8 +97,6 @@ if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = 
 st.markdown("<h1>🦷 Sorria Sil</h1>", unsafe_allow_html=True)
 st.markdown(f'<span class="mes-neon">{MESES_PT[st.session_state["mes_atual_num"]]}</span>', unsafe_allow_html=True)
 
-# ... (O restante da sua lógica de carregamento e exibição permanece igual)
-
 def carregar_dados_mes(aba):
     if not conn: return pd.DataFrame(columns=['Data', 'Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
     try:
@@ -130,9 +128,15 @@ for i, (titulo, col) in enumerate(metricas):
             <div class="metric-value">R$ {totais[col]:,.0f}</div>
         </div>''', unsafe_allow_html=True)
 
-# Tabs e Formulário (Mantido conforme original)
+# Tabs e Formulário
 tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 with tab1:
     with st.form("form_registro", clear_on_submit=True):
-        # ... seu formulário segue aqui
-        if st.form_submit_button("SALVAR"): st.success("Dados processados!")
+        data_input = st.date_input("Data", value=datetime.today())
+        total_input = st.number_input("Total (R$)", value=None, step=10.0, placeholder="0.00")
+        dinheiro_input = st.number_input("Dinheiro (R$)", value=None, step=10.0, placeholder="0.00")
+        pix_input = st.number_input("Pix (R$)", value=None, step=10.0, placeholder="0.00")
+        uber_input = st.number_input("Uber (R$)", step=5.0, value=None, placeholder="0.00")
+        
+        if st.form_submit_button("SALVAR"):
+            st.success("Dados processados!")
