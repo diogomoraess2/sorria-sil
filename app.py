@@ -35,11 +35,9 @@ class ConexaoManualSheets:
 @st.cache_resource
 def get_connection():
     try:
-        # Tenta carregar as credenciais a partir dos secrets do Streamlit Cloud
         creds_dict = dict(st.secrets["connections"]["gsheets"])
         if "private_key" in creds_dict:
             creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
-        
         creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPE)
         return ConexaoManualSheets(gspread.authorize(creds))
     except Exception as e:
@@ -52,13 +50,9 @@ conn = get_connection()
 st.markdown("""
     <style>
     h1 { font-size: 48px !important; }
-    @media (max-width: 600px) {
-        .stMainBlockContainer { padding-top: 1.5rem !important; }
-        h1 { font-size: 14vw !important; text-align: center; }
-    }
     .mes-neon { font-weight: 700; font-size: 28px; text-shadow: 0 0 10px #00e6ff; color: #ffffff; }
-    .metric-box { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 6px solid; }
-    .metric-title { font-size: 11px; font-weight: bold; text-transform: uppercase; }
+    .metric-box { background-color: #f8f9fa; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; margin: 10px 5px; border-left: 6px solid; }
+    .metric-title { font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
     .metric-value { font-size: 20px; color: #212529; font-weight: bold; }
     </style>
 """, unsafe_allow_html=True)
@@ -83,7 +77,6 @@ if 'editando_mes' not in st.session_state: st.session_state['editando_mes'] = Fa
 st.markdown("<h1>🦷 Sorria Sil</h1>", unsafe_allow_html=True)
 st.markdown(f'<span class="mes-neon">{MESES_PT[st.session_state["mes_atual_num"]]}</span>', unsafe_allow_html=True)
 
-# Lógica de seleção de mês
 if st.button("Trocar Mês"): st.session_state['editando_mes'] = not st.session_state['editando_mes']
 if st.session_state['editando_mes']:
     novo_mes = st.selectbox("Selecione o mês:", options=list(MESES_PT.keys()), format_func=lambda x: MESES_PT[x])
@@ -94,50 +87,47 @@ if st.session_state['editando_mes']:
 
 df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
 
-# Cálculo de totais
+# --- CÁLCULO DE TOTAIS ---
+colunas_financeiras = ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']
 if not df_mes.empty:
-    for col in ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']:
+    for col in colunas_financeiras:
         if col in df_mes.columns:
-            df_mes[col] = pd.to_numeric(df_mes[col].replace(r'[R$\s.]', '', regex=True).str.replace(',', '.'), errors='coerce').fillna(0)
-    totais = df_mes[['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']].sum()
+            df_mes[col] = pd.to_numeric(df_mes[col], errors='coerce').fillna(0)
+    totais = df_mes[colunas_financeiras].sum()
 else:
-    totais = pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
+    totais = pd.Series(0, index=colunas_financeiras)
 
-# Exibição de Métricas
+# --- EXIBIÇÃO DE MÉTRICAS ---
+cores = {'Total': '#007bff', 'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'Próximo mês': '#636EFA', 'Uber': '#EA4335'}
 cols = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
+
 for i, (titulo, col) in enumerate(metricas):
+    cor = cores.get(col, '#007bff')
     with cols[i]:
-        st.markdown(f'''<div class="metric-box" style="border-left-color: #007bff;"><div class="metric-title">{titulo}</div><div class="metric-value">R$ {totais[col]:,.2f}</div></div>''', unsafe_allow_html=True)
+        st.markdown(f'''
+            <div class="metric-box" style="border-left-color: {cor};">
+                <div class="metric-title" style="color: {cor};">{titulo}</div>
+                <div class="metric-value">R$ {totais[col]:,.2f}</div>
+            </div>
+        ''', unsafe_allow_html=True)
 
 st.markdown("---")
 
-# ABAS
 tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 
 with tab1:
     with st.form("form_registro", clear_on_submit=True):
         data_input = st.date_input("Data", value=datetime.today())
-        
-        # O value=None remove o 0.00, e o placeholder orienta o usuário
         total_input = st.number_input("Total (R$)", value=None, step=10.0, placeholder="0.00")
         dinheiro_input = st.number_input("Dinheiro (R$)", value=None, step=10.0, placeholder="0.00")
         pix_input = st.number_input("Pix (R$)", value=None, step=10.0, placeholder="0.00")
         uber_input = st.number_input("Uber (R$)", step=5.0, value=None, placeholder="0.00")
         
         if st.form_submit_button("SALVAR"):
-            # Lógica de validação para evitar salvar valores nulos (caso o usuário esqueça de preencher)
             if total_input is not None:
                 if conn:
-                    # Se o campo estiver vazio, usamos 0 como fallback para o cálculo
-                    nova_linha = [
-                        data_input.strftime('%d/%m/%Y'), 
-                        total_input or 0, 
-                        dinheiro_input or 0, 
-                        pix_input or 0, 
-                        0.0, 
-                        uber_input or 0
-                    ]
+                    nova_linha = [data_input.strftime('%d/%m/%Y'), total_input or 0, dinheiro_input or 0, pix_input or 0, 0.0, uber_input or 0]
                     conn.write(URL_PLANILHA, MESES_PT[st.session_state['mes_atual_num']], nova_linha)
                     st.success("Dados salvos!")
                     st.rerun()
@@ -145,9 +135,15 @@ with tab1:
                 st.warning("Por favor, preencha pelo menos o campo Total.")
 
 with tab2:
-    st.dataframe(df_mes, use_container_width=True, hide_index=True)
+    if not df_mes.empty:
+        df_exibicao = df_mes.copy()
+        for col in colunas_financeiras:
+            df_exibicao[col] = df_exibicao[col].apply(lambda x: f"R$ {x:,.2f}")
+        st.dataframe(df_exibicao, use_container_width=True, hide_index=True)
+    else:
+        st.info("Nenhum dado lançado.")
 
 with tab3:
     if not df_mes.empty:
-        fig = px.pie(values=[totais['Dinheiro'], totais['Pix'], totais['Uber']], names=['Dinheiro', 'Pix', 'Uber'], title="Distribuição do Total")
+        fig = px.pie(values=[totais['Dinheiro'], totais['Pix'], totais['Uber']], names=['Dinheiro', 'Pix', 'Uber'], title="Distribuição de Receitas")
         st.plotly_chart(fig, use_container_width=True)
