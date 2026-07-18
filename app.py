@@ -9,8 +9,8 @@ import base64
 # --- CONFIGURAÇÃO PWA ---
 manifest_json = """
 {
-  "name": "Sorria Sil",
-  "short_name": "Sorria Sil",
+  "name": "DentBoard",
+  "short_name": "DentBoard",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -27,7 +27,7 @@ manifest_json = """
 b64_manifest = base64.b64encode(manifest_json.encode()).decode()
 
 st.set_page_config(
-    page_title="Controle Financeiro - Sorria Sil",
+    page_title="Controle Financeiro - DentBoard",
     page_icon="https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/icon.png", 
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -99,7 +99,12 @@ MESES_PT = {1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 6:
 # --- LÓGICA E INTERFACE ---
 if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = datetime.today().month
 
-st.markdown("<h1>🦷 Sorria Sil</h1>", unsafe_allow_html=True)
+st.markdown("""
+    <h1 style="text-align: center;">
+        <span style="color: #007bff;">Dent</span><span style="color: #ff69b4;">Board</span>
+    </h1>
+""", unsafe_allow_html=True)
+
 st.session_state['mes_atual_num'] = st.selectbox("Selecione o mês:", options=list(MESES_PT.keys()), format_func=lambda x: MESES_PT[x], index=st.session_state['mes_atual_num']-1)
 st.markdown(f'<span class="mes-neon">{MESES_PT[st.session_state["mes_atual_num"]]}</span>', unsafe_allow_html=True)
 
@@ -149,13 +154,11 @@ with tab1:
     with st.form("form_registro", clear_on_submit=True):
         data = st.date_input("Data")
         
-        # Alterado: value=None inicia o campo vazio
         total = st.number_input("Total Diária (R$)", step=10.0, value=None, key="total_input")
         dinheiro = st.number_input("Dinheiro (R$)", step=10.0, value=None, key="dinheiro_input")
         pix = st.number_input("Pix (R$)", step=10.0, value=None, key="pix_input")
         uber = st.number_input("Uber (R$)", step=5.0, value=None, key="uber_input")
         
-        # Lógica de cálculo tratando o valor None como 0
         t = st.session_state.get("total_input") or 0
         d = st.session_state.get("dinheiro_input") or 0
         p = st.session_state.get("pix_input") or 0
@@ -165,7 +168,6 @@ with tab1:
         st.markdown(f"**Valor a Receber (Próximo mês):** R$ {valor_a_receber:,.2f}")
         
         if st.form_submit_button("SALVAR"):
-            # Garantindo que se o usuário deixar em branco, o banco receba 0
             conn.write(URL_PLANILHA, MESES_PT[st.session_state['mes_atual_num']], 
                        [str(data), t, d, p, valor_a_receber, (st.session_state.get("uber_input") or 0)])
             st.success("Dados salvos!")
