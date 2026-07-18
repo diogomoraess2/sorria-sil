@@ -28,7 +28,6 @@ b64_manifest = base64.b64encode(manifest_json.encode()).decode()
 
 st.set_page_config(
     page_title="Controle Financeiro - Sorria Sil",
-    # Use a URL direta da sua imagem no GitHub
     page_icon="https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/icon.png", 
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -62,6 +61,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown(f'<link rel="manifest" href="data:application/manifest+json;base64,{b64_manifest}">', unsafe_allow_html=True)
+
+st.markdown("""
+    <link rel="shortcut icon" href="https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/icon.png">
+""", unsafe_allow_html=True)
 
 # --- CONFIGURAÇÃO DA API ---
 SCOPE = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
