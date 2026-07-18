@@ -100,8 +100,8 @@ MESES_PT = {1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 6:
 if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = datetime.today().month
 
 st.markdown("""
-    <h1 style="text-align: center;">
-        <span style="color: #007bff;">Dent</span><span style="color: #ff69b4;">Board</span>
+    <h1 style="text-align: center; font-family: sans-serif;">
+        <span style="color: #007bff; text-shadow: 0 0 10px #007bff, 0 0 20px #007bff;">Dent</span><span style="color: #ff69b4; text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4;">Board</span>
     </h1>
 """, unsafe_allow_html=True)
 
