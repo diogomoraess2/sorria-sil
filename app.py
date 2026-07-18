@@ -85,7 +85,7 @@ st.markdown("""
 
 /* Cor dos títulos das abas */
     button[data-baseweb="tab"] {
-        color: #4a90e2 !important; /* Cor do texto quando inativo */
+        color: #222222 !important; /* Cor do texto quando inativo */
         font-weight: 600 !important;
     }
 
