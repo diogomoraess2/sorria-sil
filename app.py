@@ -33,34 +33,31 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- INJEÇÃO DE CSS (Corrigido: sem f-string para evitar erros de renderização) ---
+# --- INJEÇÃO DE CSS ---
 st.markdown("""
     <style>
-    /* Oculta elementos da interface Streamlit */
     [data-testid="stHeader"], footer, #MainMenu, .stAppDeployButton, .viewerBadge_container__1QSob {
         display: none !important;
     }
     .block-container { padding-top: 0.5rem !important; }
-    
     h1 { font-size: 32px !important; margin-bottom: 0px !important; }
-    
     .mes-neon { 
         font-weight: 700; font-size: 24px; 
         text-shadow: 0 0 10px #00e6ff; color: #ffffff; 
         margin-bottom: 15px; display: block;
     }
-    
-    .metric-box { 
+    /* Estilo robusto para os cards */
+    .metric-card { 
         background-color: #f8f9fa; padding: 10px; border-radius: 10px; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; 
         margin-bottom: 10px; border-left: 5px solid; 
+        display: flex; flex-direction: column; align-items: center;
     }
-    .metric-title { font-size: 10px; font-weight: bold; text-transform: uppercase; }
-    .metric-value { font-size: 16px; color: #212529; font-weight: bold; }
+    .metric-title { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; color: #6c757d; }
+    .metric-value { font-size: 16px; color: #212529; font-weight: 900; }
     </style>
 """, unsafe_allow_html=True)
 
-# Injeção do Manifesto PWA (Mantido com f-string apenas aqui)
 st.markdown(f'<link rel="manifest" href="data:application/manifest+json;base64,{b64_manifest}">', unsafe_allow_html=True)
 
 # --- CONFIGURAÇÃO DA API ---
@@ -118,16 +115,20 @@ df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
 colunas_financeiras = ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']
 totais = df_mes[colunas_financeiras].sum() if not df_mes.empty else pd.Series(0, index=colunas_financeiras)
 
+# Métricas com estrutura HTML melhorada
 cols = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
 cores = {'Total': '#007bff', 'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'Próximo mês': '#636EFA', 'Uber': '#EA4335'}
 
 for i, (titulo, col) in enumerate(metricas):
     with cols[i]:
-        st.markdown(f'''<div class="metric-box" style="border-left-color: {cores.get(col, '#007bff')};">
-            <div class="metric-title">{titulo}</div>
-            <div class="metric-value">R$ {totais[col]:,.0f}</div>
-        </div>''', unsafe_allow_html=True)
+        # Adicionado style explícito para garantir a cor e visibilidade
+        st.markdown(f'''
+            <div class="metric-card" style="border-left-color: {cores.get(col, '#007bff')};">
+                <div class="metric-title">{titulo}</div>
+                <div class="metric-value">R$ {totais[col]:,.0f}</div>
+            </div>
+        ''', unsafe_allow_html=True)
 
 tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 with tab1:
