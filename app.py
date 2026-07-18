@@ -33,7 +33,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- INJEÇÃO DE CSS REFORÇADO ---
+# --- CSS CONSOLIDADO ---
 st.markdown("""
     <style>
     .stApp {
@@ -46,8 +46,18 @@ st.markdown("""
         display: none !important;
     }
     .block-container { padding-top: 0.5rem !important; }
-    
-    /* Forçar fundo branco nos inputs */
+
+    /* Estilo dos Cards */
+    .metric-card { 
+        background-color: rgba(255, 255, 255, 0.85) !important; 
+        padding: 15px; border-radius: 12px; 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08); text-align: center; 
+        border: 1px solid #d0e8d0; border-left: 6px solid; 
+    }
+    .metric-title { font-size: 13px !important; font-weight: 700; color: #555 !important; }
+    .metric-value { font-size: 22px !important; font-weight: 700; color: #222 !important; }
+
+    /* Forçar inputs brancos */
     div[data-baseweb="base-input"], div[data-baseweb="input"], input {
         background-color: #ffffff !important;
         color: #000000 !important;
@@ -60,21 +70,24 @@ st.markdown("""
         margin: 0 !important;
     }
     
-    /* Botão Salvar */
-    div.stButton > button {
+    /* Botão Salvar Suave */
+    div.stFormSubmitButton > button {
         background-color: #a8e0a8 !important; 
         color: #ffffff !important;
         border: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
     }
     
     label { color: #222 !important; font-weight: 600 !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- RESTANTE DO CÓDIGO ---
+# --- CONFIGURAÇÃO DA API ---
 SCOPE = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M/edit?usp=sharing"
 
+# --- LÓGICA ---
 class ConexaoManualSheets:
     def __init__(self, client):
         self.client = client
@@ -106,8 +119,9 @@ if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = 
 st.markdown('<h1 style="text-align: center;"><span style="color: #4a90e2;">Dent</span><span style="color: #f5a623;">Board</span></h1>', unsafe_allow_html=True)
 st.session_state['mes_atual_num'] = st.selectbox("Selecione o mês:", options=list(MESES_PT.keys()), format_func=lambda x: MESES_PT[x], index=st.session_state['mes_atual_num']-1)
 
-# Lógica da aba lançar
+# Lógica de interface
 tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
+
 with tab1:
     with st.form("form_registro", clear_on_submit=True):
         data = st.date_input("Data")
@@ -117,3 +131,9 @@ with tab1:
         uber = st.number_input("Uber (R$)", step=5.0, value=None)
         if st.form_submit_button("SALVAR"):
             st.success("Dados salvos!")
+
+with tab2:
+    st.write("Dados do mês selecionado.")
+
+with tab3:
+    st.write("Gráficos.")
