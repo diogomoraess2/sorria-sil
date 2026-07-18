@@ -53,10 +53,10 @@ st.markdown("""
         display: flex; flex-direction: column; align-items: center;
     }
     .metric-title { 
-        font-size: 12px !important; font-weight: 800; text-transform: uppercase; 
+        font-size: 12px !important; font-weight: 900; text-transform: uppercase; 
         margin-bottom: 2px; color: #000000 !important; 
     }
-    .metric-value { font-size: 18px !important; font-weight: 900; }
+    .metric-value { font-size: 18px !important; font-weight: 1000; }
     </style>
 """, unsafe_allow_html=True)
 
