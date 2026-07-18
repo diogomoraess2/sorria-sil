@@ -36,27 +36,41 @@ st.set_page_config(
 # --- INJEÇÃO DE CSS ---
 st.markdown("""
     <style>
+    /* Estilos base */
     [data-testid="stHeader"], footer, #MainMenu, .stAppDeployButton, .viewerBadge_container__1QSob {
         display: none !important;
     }
     .block-container { padding-top: 0.5rem !important; }
     h1 { font-size: 50px !important; margin-bottom: 0px !important; }
+    
     .mes-neon { 
         font-weight: 700; font-size: 35px !important; 
         text-shadow: 0 0 10px #00e6ff; color: #ffffff; 
         margin-bottom: 10px; display: block;
     }
+    
+    /* Novo background e ajustes para modo escuro */
+    .stApp {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    }
     .metric-card { 
-        background-color: #f8f9fa; padding: 5px; border-radius: 10px; 
+        background-color: rgba(255, 255, 255, 0.05) !important; 
+        padding: 5px; border-radius: 10px; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; 
         margin-bottom: 5px; border-left: 6px solid; 
         display: flex; flex-direction: column; align-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .metric-title { 
         font-size: 16px !important; font-weight: 900; text-transform: uppercase; 
-        margin-bottom: 2px; color: #000000 !important; 
+        margin-bottom: 2px; color: #ffffff !important; 
     }
     .metric-value { font-size: 22px !important; font-weight: 1000; }
+    
+    /* Ajuste de labels para o fundo escuro */
+    .stSelectbox label, .stDateInput label, .stNumberInput label, .stMarkdown p {
+        color: #ffffff !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -195,7 +209,8 @@ with tab3:
             color_discrete_map=cores_map
         )
         
-        fig.update_layout(margin=dict(t=40, b=0, l=0, r=0))
+        # Gráfico com fundo escuro
+        fig.update_layout(template="plotly_dark", margin=dict(t=40, b=0, l=0, r=0))
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("Nenhum dado para exibir nos gráficos.")
