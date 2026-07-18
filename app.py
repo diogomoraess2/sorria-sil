@@ -33,9 +33,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- INJEÇÃO DE CSS (ESTILO SUAVE E CUSTOMIZADO) ---
+# --- INJEÇÃO DE CSS (ESTILO EASYNOTES + BACKGROUND QUADRICULADO) ---
 st.markdown("""
     <style>
+    /* Aplica a imagem de fundo quadriculada */
     .stApp {
         background-image: url('https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/quadro-verde.jpg');
         background-size: cover;
@@ -47,13 +48,16 @@ st.markdown("""
     }
     .block-container { padding-top: 0.5rem !important; }
     
+    /* Título sóbrio */
     h1 { font-family: 'Segoe UI', sans-serif !important; margin-bottom: 20px !important; }
 
+    /* Estilo de texto do mês */
     .mes-clean { 
         font-weight: 600; font-size: 28px !important; 
         color: #333 !important; margin-bottom: 15px; display: block;
     }
     
+    /* Cards estilo EasyNotes com transparência */
     .metric-card { 
         background-color: rgba(255, 255, 255, 0.85) !important; 
         padding: 15px; border-radius: 12px; 
@@ -62,32 +66,23 @@ st.markdown("""
         border-left: 6px solid; 
         display: flex; flex-direction: column; align-items: center;
     }
+    .metric-title { 
+        font-size: 13px !important; font-weight: 700; text-transform: uppercase; 
+        margin-bottom: 5px; color: #555 !important; 
+    }
+    .metric-value { font-size: 22px !important; font-weight: 700; color: #222 !important; }
     
-    /* Ajuste suave dos campos de entrada */
-    div[data-baseweb="select"], div[data-baseweb="input"], div[data-baseweb="base-input"] {
-        background-color: #ffffff !important;
-        border: 1px solid #c8e6c9 !important;
-        border-radius: 8px !important;
+    /* Ajuste de labels e textos */
+    .stSelectbox label, .stDateInput label, .stNumberInput label, .stMarkdown p {
+        color: #222 !important; font-weight: 500;
     }
-    
-    /* Botão de Salvar Suave */
-    div.stButton > button {
-        background-color: #a8e0a8 !important; /* Verde suave */
-        color: #ffffff !important;
-        border: none !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-    }
-    div.stButton > button:hover {
-        background-color: #8cc68c !important; /* Tom um pouco mais fechado no hover */
-    }
-
-    label { color: #222 !important; font-weight: 600 !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- CONFIGURAÇÃO DA API E RESTANTE DO CÓDIGO ---
-# (Mantive a lógica inalterada para garantir o funcionamento)
+st.markdown(f'<link rel="manifest" href="data:application/manifest+json;base64,{b64_manifest}">', unsafe_allow_html=True)
+st.markdown('<link rel="shortcut icon" href="https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/icon.png">', unsafe_allow_html=True)
+
+# --- CONFIGURAÇÃO DA API ---
 SCOPE = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M/edit?usp=sharing"
 
@@ -117,9 +112,14 @@ def get_connection():
 conn = get_connection()
 MESES_PT = {1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto', 9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'}
 
+# --- LÓGICA E INTERFACE ---
 if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = datetime.today().month
 
-st.markdown('<h1 style="text-align: center;"><span style="color: #4a90e2;">Dent</span><span style="color: #f5a623;">Board</span></h1>', unsafe_allow_html=True)
+st.markdown("""
+    <h1 style="text-align: center; width: 100%; display: block;">
+        <span style="color: #4a90e2;">Dent</span><span style="color: #f5a623;">Board</span>
+    </h1>
+""", unsafe_allow_html=True)
 
 st.session_state['mes_atual_num'] = st.selectbox("Selecione o mês:", options=list(MESES_PT.keys()), format_func=lambda x: MESES_PT[x], index=st.session_state['mes_atual_num']-1)
 st.markdown(f'<span class="mes-clean">{MESES_PT[st.session_state["mes_atual_num"]]}</span>', unsafe_allow_html=True)
@@ -142,18 +142,27 @@ def carregar_dados_mes(aba):
 df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
 totais = df_mes[['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']].sum() if not df_mes.empty else pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
+# Métricas com Cores Estilo EasyNotes
 cols = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
-cores = {'Total': '#4a90e2', 'Dinheiro': '#7ed321', 'Pix': '#f5a623', 'Próximo mês': '#9013fe', 'Uber': '#d0021b'}
+cores = {
+    'Total': '#4a90e2', 
+    'Dinheiro': '#7ed321', 
+    'Pix': '#f5a623', 
+    'Próximo mês': '#9013fe', 
+    'Uber': '#d0021b'
+}
 
 for i, (titulo, col) in enumerate(metricas):
     with cols[i]:
         valor_formatado = f"R$ {totais[col]:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-        st.markdown(f'''<div class="metric-card" style="border-left-color: {cores.get(col, '#4a90e2')};">
+        cor_hex = cores.get(col, '#4a90e2')
+        st.markdown(f'''<div class="metric-card" style="border-left-color: {cor_hex};">
             <div class="metric-title">{titulo}</div>
             <div class="metric-value">{valor_formatado}</div>
             </div>''', unsafe_allow_html=True)
 
+# --- ABAS ---
 tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 
 with tab1:
@@ -181,8 +190,11 @@ with tab3:
         colunas_grafico = ['Dinheiro', 'Pix', 'Uber', 'Próximo mês']
         valores_grafico = totais[colunas_grafico]
         cores_map = {'Dinheiro': '#7ed321', 'Pix': '#f5a623', 'Uber': '#d0021b', 'Próximo mês': '#9013fe'}
+        
         fig = px.pie(values=valores_grafico, names=colunas_grafico, title="Distribuição de Receitas",
                      color=colunas_grafico, color_discrete_map=cores_map)
+        
+        # Gráfico com tema claro e limpo
         fig.update_layout(template="plotly_white", margin=dict(t=40, b=0, l=0, r=0))
         st.plotly_chart(fig, use_container_width=True)
     else:
