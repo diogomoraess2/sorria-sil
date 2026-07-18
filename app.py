@@ -28,7 +28,8 @@ b64_manifest = base64.b64encode(manifest_json.encode()).decode()
 
 st.set_page_config(
     page_title="Controle Financeiro - Sorria Sil",
-    page_icon="icon.png",  # Nome do seu arquivo
+    # Use a URL direta da sua imagem no GitHub
+    page_icon="https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/icon.png", 
     layout="wide",
     initial_sidebar_state="collapsed"
 )
