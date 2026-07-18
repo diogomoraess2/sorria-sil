@@ -36,7 +36,8 @@ st.set_page_config(
 # --- INJEÇÃO DE CSS (ESTILO EASYNOTES + BACKGROUND QUADRICULADO) ---
 
 st.markdown("""
-    <style>
+    
+<style>
     /* Aplica a imagem de fundo quadriculada */
     .stApp {
         background-image: url('https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/quadro-verde.jpg');
@@ -76,20 +77,20 @@ st.markdown("""
         border: 1px solid #d0e8d0 !important;
     }
 
-    /* CORREÇÃO PARA AS ABAS */
-    .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
+    /* FORÇANDO A COR DAS ABAS */
+    button[data-baseweb="tab"] {
         color: #222222 !important;
-        font-weight: 600 !important;
     }
 
-    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] [data-testid="stMarkdownContainer"] p {
+    button[aria-selected="true"] {
         color: #f5a623 !important;
     }
 
-    .stTabs [data-baseweb="tab-highlight"] {
+    div[data-baseweb="tab-highlight"] {
         background-color: #f5a623 !important;
     }
     </style>
+
 """, unsafe_allow_html=True)
 
 st.markdown(f'<link rel="manifest" href="data:application/manifest+json;base64,{b64_manifest}">', unsafe_allow_html=True)
