@@ -1,9 +1,75 @@
+
 import streamlit as st  
 import pandas as pd  
 import plotly.express as px
 from datetime import datetime  
 from google.oauth2.service_account import Credentials
 import gspread
+import streamlit as st
+import gspread
+import pandas as pd
+from oauth2client.service_account import ServiceAccountCredentials
+
+# --- CONFIGURAÇÃO DA API ---
+# Escopos necessários para acessar o Google Sheets e Drive
+SCOPE = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+
+# ID da planilha (cole o ID que você encontrou aqui)
+SPREADSHEET_ID = '1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M' 
+
+def get_client():
+    """Inicializa a conexão com a API do Google"""
+    try:
+        # Tenta usar secrets (para deploy no Streamlit Cloud) ou arquivo local
+        if "gcp_service_account" in st.secrets:
+            creds_dict = dict(st.secrets["gcp_service_account"])
+            creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, SCOPE)
+        else:
+            creds = ServiceAccountCredentials.from_json_keyfile_name('service_account.json', SCOPE)
+        
+        return gspread.authorize(creds)
+    except Exception as e:
+        st.error(f"Erro ao autenticar: {e}")
+        return None
+
+CLIENT = get_client()
+
+# --- FUNÇÕES DE DADOS ---
+def carregar_dados_mes(aba):
+    if CLIENT is None: return pd.DataFrame()
+    try:
+        sh = CLIENT.open_by_key(SPREADSHEET_ID)
+        worksheet = sh.worksheet(aba)
+        data = worksheet.get_all_records()
+        df = pd.DataFrame(data)
+        if not df.empty and 'Data' in df.columns:
+            df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y').dt.date
+        return df
+    except Exception as e:
+        st.error(f"Erro ao ler a planilha '{aba}': {e}")
+        return pd.DataFrame(columns=['Data', 'Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
+
+def salvar_dados(df, aba):
+    if CLIENT is None: return False
+    try:
+        sh = CLIENT.open_by_key(SPREADSHEET_ID)
+        worksheet = sh.worksheet(aba)
+        
+        # Prepara os dados para salvar
+        df_salvar = df.copy()
+        if 'Data' in df_salvar.columns:
+            df_salvar['Data'] = df_salvar['Data'].apply(lambda x: x.strftime('%d/%m/%Y'))
+        
+        # Limpa e atualiza a planilha
+        worksheet.clear()
+        worksheet.update([df_salvar.columns.values.tolist()] + df_salvar.values.tolist())
+        return True
+    except Exception as e:
+        st.error(f"Erro ao salvar na planilha: {e}")
+        return False
+
+# --- SEU CÓDIGO RESTANTE ABAIXO ---
+# (Aqui continua o restante do seu app, como os inputs e botões)
 
 # Configuração da página
 st.set_page_config(  
