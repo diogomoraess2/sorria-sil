@@ -131,15 +131,23 @@ tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 with tab1:
     with st.form("form_registro", clear_on_submit=True):
         data = st.date_input("Data")
-        total = st.number_input("Total Diária (R$)", step=10.0)
-        dinheiro = st.number_input("Dinheiro (R$)", step=10.0)
-        pix = st.number_input("Pix (R$)", step=10.0)
-        uber = st.number_input("Uber (R$)", step=5.0)
-        prox_mes = st.number_input("A Receber (Próximo mês) (R$)", step=10.0)
+        total = st.number_input("Total Diária (R$)", step=10.0, key="total_input")
+        dinheiro = st.number_input("Dinheiro (R$)", step=10.0, key="dinheiro_input")
+        pix = st.number_input("Pix (R$)", step=10.0, key="pix_input")
+        uber = st.number_input("Uber (R$)", step=5.0, key="uber_input")
+        
+        # Lógica de cálculo automático do "A Receber"
+        # O valor a receber é: Total - (Dinheiro + Pix)
+        valor_a_receber = max(0.0, st.session_state.get("total_input", 0) - 
+                              (st.session_state.get("dinheiro_input", 0) + 
+                               st.session_state.get("pix_input", 0)))
+        
+        st.markdown(f"**Valor a Receber (Próximo mês):** R$ {valor_a_receber:,.2f}")
         
         if st.form_submit_button("SALVAR"):
+            # O valor é salvo automaticamente no banco de dados baseado no cálculo
             conn.write(URL_PLANILHA, MESES_PT[st.session_state['mes_atual_num']], 
-                       [str(data), total, dinheiro, pix, prox_mes, uber])
+                       [str(data), total, dinheiro, pix, valor_a_receber, uber])
             st.success("Dados salvos!")
 
 with tab2:
