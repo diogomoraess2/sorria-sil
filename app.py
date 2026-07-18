@@ -52,8 +52,11 @@ st.markdown("""
         margin-bottom: 5px; border-left: 6px solid; 
         display: flex; flex-direction: column; align-items: center;
     }
-    .metric-title { font-size: 12px !important; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; color: #6c757d; }
-    .metric-value { font-size: 18px !important; color: #212529; font-weight: 900; }
+    .metric-title { 
+        font-size: 12px !important; font-weight: 800; text-transform: uppercase; 
+        margin-bottom: 2px; color: #000000 !important; 
+    }
+    .metric-value { font-size: 18px !important; font-weight: 900; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -115,9 +118,7 @@ df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
 totais = df_mes[['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']].sum() if not df_mes.empty else pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
 # Métricas
-# Métricas
 cols = st.columns(5)
-# Note que incluí 'A Receber' aqui para alinhar com o dicionário de cores
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
 cores = {
     'Total': '#007bff', 
@@ -132,7 +133,6 @@ for i, (titulo, col) in enumerate(metricas):
         valor_formatado = f"R$ {totais[col]:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
         cor_hex = cores.get(col, '#007bff')
         
-        # O estilo color: {cor_hex} agora é aplicado ao valor do card
         st.markdown(f'''<div class="metric-card" style="border-left-color: {cor_hex};">
             <div class="metric-title">{titulo}</div>
             <div class="metric-value" style="color: {cor_hex};">{valor_formatado}</div>
@@ -149,8 +149,6 @@ with tab1:
         pix = st.number_input("Pix (R$)", step=10.0, key="pix_input")
         uber = st.number_input("Uber (R$)", step=5.0, key="uber_input")
         
-        # Lógica de cálculo automático do "A Receber"
-        # O valor a receber é: Total - (Dinheiro + Pix)
         valor_a_receber = max(0.0, st.session_state.get("total_input", 0) - 
                               (st.session_state.get("dinheiro_input", 0) + 
                                st.session_state.get("pix_input", 0)))
@@ -158,7 +156,6 @@ with tab1:
         st.markdown(f"**Valor a Receber (Próximo mês):** R$ {valor_a_receber:,.2f}")
         
         if st.form_submit_button("SALVAR"):
-            # O valor é salvo automaticamente no banco de dados baseado no cálculo
             conn.write(URL_PLANILHA, MESES_PT[st.session_state['mes_atual_num']], 
                        [str(data), total, dinheiro, pix, valor_a_receber, uber])
             st.success("Dados salvos!")
@@ -171,7 +168,6 @@ with tab3:
         colunas_grafico = ['Dinheiro', 'Pix', 'Uber', 'Próximo mês']
         valores_grafico = totais[colunas_grafico]
         
-        # Mapeamento de cores seguindo os cards
         cores_map = {
             'Dinheiro': '#25D366', 
             'Pix': '#FBBC05', 
