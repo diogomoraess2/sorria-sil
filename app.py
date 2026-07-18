@@ -19,7 +19,7 @@ manifest_json = """
   "theme_color": "#00e6ff",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3062/3062634.png",
+      "src": "https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
