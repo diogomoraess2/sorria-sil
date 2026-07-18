@@ -56,7 +56,7 @@ st.markdown("""
     
     /* Ajuste da margem superior do container principal */
     .block-container { 
-        padding-top: 1rem !important; 
+        padding-top: 0.3rem !important; /* Diminuí de 1rem para 0.3rem */
     }
     
     h1 { font-size: 48px !important; }
