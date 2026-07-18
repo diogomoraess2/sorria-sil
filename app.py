@@ -1,135 +1,23 @@
-
-import streamlit as st  
-import pandas as pd  
-import plotly.express as px
-from datetime import datetime  
-from google.oauth2.service_account import Credentials
-import gspread
 import streamlit as st
-import gspread
 import pandas as pd
+import plotly.express as px
+from datetime import datetime
+import gspread
+from google.oauth2.service_account import Credentials
 from oauth2client.service_account import ServiceAccountCredentials
 
+# --- CONFIGURAÇÃO DA PÁGINA ---
+st.set_page_config(
+    page_title="Controle Financeiro - Sorria Sil",
+    page_icon="🦷",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
 # --- CONFIGURAÇÃO DA API ---
-# Escopos necessários para acessar o Google Sheets e Drive
 SCOPE = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M/edit?usp=sharing"
 
-# ID da planilha (cole o ID que você encontrou aqui)
-SPREADSHEET_ID = '1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M' 
-
-def get_client():
-    """Inicializa a conexão com a API do Google"""
-    try:
-        # Tenta usar secrets (para deploy no Streamlit Cloud) ou arquivo local
-        if "gcp_service_account" in st.secrets:
-            creds_dict = dict(st.secrets["gcp_service_account"])
-            creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, SCOPE)
-        else:
-            creds = ServiceAccountCredentials.from_json_keyfile_name('service_account.json', SCOPE)
-        
-        return gspread.authorize(creds)
-    except Exception as e:
-        st.error(f"Erro ao autenticar: {e}")
-        return None
-
-CLIENT = get_client()
-
-# --- FUNÇÕES DE DADOS ---
-def carregar_dados_mes(aba):
-    if CLIENT is None: return pd.DataFrame()
-    try:
-        sh = CLIENT.open_by_key(SPREADSHEET_ID)
-        worksheet = sh.worksheet(aba)
-        data = worksheet.get_all_records()
-        df = pd.DataFrame(data)
-        if not df.empty and 'Data' in df.columns:
-            df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y').dt.date
-        return df
-    except Exception as e:
-        st.error(f"Erro ao ler a planilha '{aba}': {e}")
-        return pd.DataFrame(columns=['Data', 'Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
-
-def salvar_dados(df, aba):
-    if CLIENT is None: return False
-    try:
-        sh = CLIENT.open_by_key(SPREADSHEET_ID)
-        worksheet = sh.worksheet(aba)
-        
-        # Prepara os dados para salvar
-        df_salvar = df.copy()
-        if 'Data' in df_salvar.columns:
-            df_salvar['Data'] = df_salvar['Data'].apply(lambda x: x.strftime('%d/%m/%Y'))
-        
-        # Limpa e atualiza a planilha
-        worksheet.clear()
-        worksheet.update([df_salvar.columns.values.tolist()] + df_salvar.values.tolist())
-        return True
-    except Exception as e:
-        st.error(f"Erro ao salvar na planilha: {e}")
-        return False
-
-# --- SEU CÓDIGO RESTANTE ABAIXO ---
-# (Aqui continua o restante do seu app, como os inputs e botões)
-
-# Configuração da página
-st.set_page_config(  
-    page_title="Controle Financeiro - Sorria Sil",  
-    page_icon="🦷",  
-    layout="wide",  
-    initial_sidebar_state="collapsed"  
-)  
-
-# Estilização CSS completa
-st.markdown("""  
-    <style>  
-    /* Ajuste para desktop */
-    h1 { font-size: 48px !important; }
-
-    /* Ajuste para dispositivos móveis */
-    @media (max-width: 600px) {
-        .stMainBlockContainer, .block-container {
-            padding-top: 1.5rem !important;
-            padding-bottom: 1rem !important;
-            margin-top: 10px !important; 
-        }
-        
-        h1 { 
-            font-size: 14vw !important; 
-            width: 100% !important; 
-            text-align: center !important;
-            display: block !important;
-            white-space: nowrap !important;
-            margin: 0 !important;
-            padding: 10px 0 !important; 
-            box-sizing: border-box !important; 
-        }
-        .mes-neon { font-size: 24px !important; margin-bottom: 10px !important; }
-    }
-
-    /* Estilo padrão do Mês (Modo Escuro) */
-    .mes-neon { 
-        font-weight: 700; 
-        font-size: 28px; 
-        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00e6ff, 0 0 30px #00e6ff; 
-        color: #ffffff; 
-    }
-
-    /* Ajuste para Modo Claro: Mantém o estilo, mas troca a cor e o brilho para Lilás */
-    @media (prefers-color-scheme: light) {
-        .mes-neon { 
-            color: #8A2BE2 !important; 
-            /* Brilho ajustado para lilás para não "branquear" o texto */
-            text-shadow: 0 0 5px #8e05f5, 0 0 10px #8e05f5, 0 0 20px #8A2BE2 !important; 
-        }
-    }
-    
-    .metric-box { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; margin-bottom: 10px; border-left: 6px solid; }  
-    .metric-title { font-size: 11px; font-weight: bold; text-transform: uppercase; }  
-    .metric-value { font-size: 20px; color: #212529; font-weight: bold; }  
-    </style>  
-""", unsafe_allow_html=True)  
-
-# --- CONEXÃO ---
 class ConexaoManualSheets:
     def __init__(self, client):
         self.client = client
@@ -138,114 +26,40 @@ class ConexaoManualSheets:
         worksheet = sh.worksheet(sheet)
         return pd.DataFrame(worksheet.get_all_records())
 
-try:
-    if "connections" not in st.secrets or "gsheets" not in st.secrets["connections"]:
-        st.stop()
-    creds_dict = dict(st.secrets["connections"]["gsheets"])
-    if "private_key" in creds_dict:
-        creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
-    escopos = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-    credenciais_google = Credentials.from_service_account_info(creds_dict, scopes=escopos)
-    cliente_gspread = gspread.authorize(credenciais_google)
-    conn = ConexaoManualSheets(cliente_gspread)
-except Exception:
-    st.stop()
+# --- AUTENTICAÇÃO ---
+@st.cache_resource
+def get_connection():
+    try:
+        # Tenta usar secrets
+        if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
+            creds_dict = dict(st.secrets["connections"]["gsheets"])
+            if "private_key" in creds_dict:
+                creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+            creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPE)
+        else:
+            # Fallback para local
+            creds = ServiceAccountCredentials.from_json_keyfile_name('service_account.json', SCOPE)
+        
+        return ConexaoManualSheets(gspread.authorize(creds))
+    except Exception as e:
+        st.error(f"Erro de conexão: {e}")
+        return None
 
-URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1mbT5DJ9re6i6RR8v2rdpUbW3-J00NXx-e1hbe-j4M1M/edit?usp=sharing"  
-MESES_PT = {1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto', 9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'}  
+conn = get_connection()
 
-def carregar_dados_mes(aba):  
-    try:  
-        df = conn.read(spreadsheet=URL_PLANILHA, sheet=aba)  
+# --- CSS E VARIÁVEIS ---
+st.markdown("""<style>/* Seu CSS aqui */</style>""", unsafe_allow_html=True)
+MESES_PT = {1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto', 9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'}
+
+def carregar_dados_mes(aba):
+    if not conn: return pd.DataFrame(columns=['Data', 'Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
+    try:
+        df = conn.read(spreadsheet=URL_PLANILHA, sheet=aba)
         df = df.dropna(how='all')
         if not df.empty and 'Data' in df.columns:
-            df['Data'] = pd.to_datetime(df['Data'], dayfirst=True, errors='coerce').dt.date  
+            df['Data'] = pd.to_datetime(df['Data'], dayfirst=True, errors='coerce').dt.date
             return df.dropna(subset=['Data'])
-    except: pass  
-    return pd.DataFrame(columns=['Data', 'Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])  
-  
-# --- INTERFACE ---
-if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = datetime.today().month
-if 'editando_mes' not in st.session_state: st.session_state['editando_mes'] = False
+    except: pass
+    return pd.DataFrame(columns=['Data', 'Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
-st.markdown("<h1>🦷 Sorria Sil</h1>", unsafe_allow_html=True)
-
-st.markdown(f'<span class="mes-neon">{MESES_PT[st.session_state["mes_atual_num"]]}</span>', unsafe_allow_html=True)
-
-# Lógica de seleção
-if not st.session_state['editando_mes']:
-    if st.button("Trocar Mês"):
-        st.session_state['editando_mes'] = True
-        st.rerun()
-else:
-    novo_mes = st.selectbox("Selecione o mês:", options=list(MESES_PT.keys()), format_func=lambda x: MESES_PT[x], index=st.session_state['mes_atual_num'] - 1)
-    col_a, col_b = st.columns(2)
-    if col_a.button("Confirmar"):
-        st.session_state['mes_atual_num'] = novo_mes
-        st.session_state['editando_mes'] = False
-        st.rerun()
-    if col_b.button("Cancelar"):
-        st.session_state['editando_mes'] = False
-        st.rerun()
-
-df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
-
-# Cálculo de totais
-if not df_mes.empty:
-    for col in ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']:
-        if col in df_mes.columns:
-            limpo = df_mes[col].replace(r'[R$\s.]', '', regex=True).str.replace(',', '.', regex=False)
-            df_mes[col] = pd.to_numeric(limpo, errors='coerce').fillna(0)
-    totais = df_mes[['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']].sum()
-else:
-    totais = pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
-
-# Mapeamento de cores
-cores = {'Total': '#007bff', 'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'A Receber': '#636EFA', 'Uber': '#EA4335'}
-
-# --- MÉTRICAS ---
-cols = st.columns(5)
-metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
-for i, (titulo, col) in enumerate(metricas):
-    cor_lateral = cores.get(titulo, '#007bff')
-    with cols[i]:
-        st.markdown(f'''
-            <div class="metric-box" style="border-left-color: {cor_lateral};">
-                <div class="metric-title" style="color: {cor_lateral};">{titulo}</div>
-                <div class="metric-value">R$ {totais[col]:,.2f}</div>
-            </div>
-        ''', unsafe_allow_html=True)
-
-st.markdown("---")
-
-# --- ABAS ---
-tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
-
-with tab1:
-    with st.form("form_registro", clear_on_submit=True):
-        st.date_input("Data")
-        st.number_input("Total (R$)", step=10.0)
-        st.number_input("Dinheiro (R$)", step=10.0)
-        st.number_input("Pix (R$)", step=10.0)
-        st.number_input("Uber (R$)", step=5.0)
-        if st.form_submit_button("SALVAR"):
-            st.success("Dados enviados!")
-
-with tab2:
-    st.dataframe(df_mes, use_container_width=True, hide_index=True)
-
-with tab3:
-    st.subheader("Análise Financeira")
-    if not df_mes.empty:
-        dados_pizza = {'Categoria': ['Dinheiro', 'Pix', 'Uber', 'A Receber'], 
-                       'Valores': [totais['Dinheiro'], totais['Pix'], totais['Uber'], totais['Próximo mês']]}
-        df_pizza = pd.DataFrame(dados_pizza)
-        cores_pizza = {'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'Uber': '#EA4335', 'A Receber': '#636EFA'}
-        fig_pizza = px.pie(df_pizza, values='Valores', names='Categoria', title="Distribuição do Total", color='Categoria', color_discrete_map=cores_pizza)
-        st.plotly_chart(fig_pizza, use_container_width=True)
-        
-        df_plot = df_mes.sort_values(by='Data')
-        fig_linha = px.line(df_plot, x='Data', y='Total', title='Evolução do Faturamento Total', markers=True)
-        st.plotly_chart(fig_linha, use_container_width=True)
-    else:
-        st.info("Sem dados suficientes para gráficos.")
+# --- INTERFACE (O restante do seu código segue aqui...) ---
