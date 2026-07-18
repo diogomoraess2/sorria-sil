@@ -33,14 +33,13 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- INJEÇÃO DE CSS (Compactado conforme solicitado) ---
+# --- INJEÇÃO DE CSS ---
 st.markdown("""
     <style>
     [data-testid="stHeader"], footer, #MainMenu, .stAppDeployButton, .viewerBadge_container__1QSob {
         display: none !important;
     }
     .block-container { padding-top: 0.5rem !important; }
-    
     h1 { font-size: 50px !important; margin-bottom: 0px !important; }
     .mes-neon { 
         font-weight: 700; font-size: 35px !important; 
@@ -71,6 +70,10 @@ class ConexaoManualSheets:
         sh = self.client.open_by_url(spreadsheet)
         worksheet = sh.worksheet(sheet)
         return pd.DataFrame(worksheet.get_all_records())
+    def write(self, spreadsheet, sheet, row_data):
+        sh = self.client.open_by_url(spreadsheet)
+        worksheet = sh.worksheet(sheet)
+        worksheet.append_row(row_data)
 
 @st.cache_resource
 def get_connection():
@@ -111,6 +114,7 @@ def carregar_dados_mes(aba):
 df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
 totais = df_mes[['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']].sum() if not df_mes.empty else pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
+# Métricas
 cols = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
 cores = {'Total': '#007bff', 'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'Próximo mês': '#636EFA', 'Uber': '#EA4335'}
@@ -126,17 +130,22 @@ tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 
 with tab1:
     with st.form("form_registro", clear_on_submit=True):
-        st.date_input("Data")
-        st.number_input("Total (R$)", step=10.0)
-        st.form_submit_button("SALVAR")
+        data = st.date_input("Data")
+        total = st.number_input("Total Diária (R$)", step=10.0)
+        dinheiro = st.number_input("Dinheiro (R$)", step=10.0)
+        pix = st.number_input("Pix (R$)", step=10.0)
+        uber = st.number_input("Uber (R$)", step=5.0)
+        prox_mes = st.number_input("A Receber (Próximo mês) (R$)", step=10.0)
+        
+        if st.form_submit_button("SALVAR"):
+            conn.write(URL_PLANILHA, MESES_PT[st.session_state['mes_atual_num']], 
+                       [str(data), total, dinheiro, pix, prox_mes, uber])
+            st.success("Dados salvos!")
 
 with tab2:
-    st.write("Registros do mês:")
     st.dataframe(df_mes, use_container_width=True)
 
 with tab3:
     if not df_mes.empty:
         fig = px.pie(values=totais[['Dinheiro', 'Pix', 'Uber']], names=['Dinheiro', 'Pix', 'Uber'], title="Distribuição de Receitas")
         st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.info("Nenhum dado para exibir nos gráficos.")
