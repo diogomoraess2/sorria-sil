@@ -38,26 +38,26 @@ st.markdown(f"""
     <link rel="manifest" href="data:application/manifest+json;base64,{b64_manifest}">
     <style>
     /* Oculta elementos da interface Streamlit */
-    [data-testid="stHeader"], footer, #MainMenu, .stAppDeployButton, .viewerBadge_container__1QSob {
+    [data-testid="stHeader"], footer, #MainMenu, .stAppDeployButton, .viewerBadge_container__1QSob {{
         display: none !important;
-    }
-    .block-container { padding-top: 0.5rem !important; }
+    }}
+    .block-container {{ padding-top: 0.5rem !important; }}
     
-    h1 { font-size: 32px !important; margin-bottom: 0px !important; }
+    h1 {{ font-size: 32px !important; margin-bottom: 0px !important; }}
     
-    .mes-neon { 
+    .mes-neon {{ 
         font-weight: 700; font-size: 24px; 
         text-shadow: 0 0 10px #00e6ff; color: #ffffff; 
         margin-bottom: 15px; display: block;
-    }
+    }}
     
-    .metric-box { 
+    .metric-box {{ 
         background-color: #f8f9fa; padding: 10px; border-radius: 10px; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; 
         margin-bottom: 10px; border-left: 5px solid; 
-    }
-    .metric-title { font-size: 10px; font-weight: bold; text-transform: uppercase; }
-    .metric-value { font-size: 16px; color: #212529; font-weight: bold; }
+    }}
+    .metric-title {{ font-size: 10px; font-weight: bold; text-transform: uppercase; }}
+    .metric-value {{ font-size: 16px; color: #212529; font-weight: bold; }}
     </style>
 """, unsafe_allow_html=True)
 
