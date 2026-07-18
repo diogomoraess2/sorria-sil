@@ -6,7 +6,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 import base64
 
-# --- CONFIGURAÇÃO PWA E ESTILO ---
+# --- CONFIGURAÇÃO PWA ---
 manifest_json = """
 {
   "name": "Sorria Sil",
@@ -33,33 +33,35 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Injeção de CSS e Metatags com chaves dobradas para evitar NameError
-st.markdown(f"""
-    <link rel="manifest" href="data:application/manifest+json;base64,{b64_manifest}">
+# --- INJEÇÃO DE CSS (Corrigido: sem f-string para evitar erros de renderização) ---
+st.markdown("""
     <style>
     /* Oculta elementos da interface Streamlit */
-    [data-testid="stHeader"], footer, #MainMenu, .stAppDeployButton, .viewerBadge_container__1QSob {{
+    [data-testid="stHeader"], footer, #MainMenu, .stAppDeployButton, .viewerBadge_container__1QSob {
         display: none !important;
-    }}
-    .block-container {{ padding-top: 0.5rem !important; }}
+    }
+    .block-container { padding-top: 0.5rem !important; }
     
-    h1 {{ font-size: 32px !important; margin-bottom: 0px !important; }}
+    h1 { font-size: 32px !important; margin-bottom: 0px !important; }
     
-    .mes-neon {{ 
+    .mes-neon { 
         font-weight: 700; font-size: 24px; 
         text-shadow: 0 0 10px #00e6ff; color: #ffffff; 
         margin-bottom: 15px; display: block;
-    }}
+    }
     
-    .metric-box {{ 
+    .metric-box { 
         background-color: #f8f9fa; padding: 10px; border-radius: 10px; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; 
         margin-bottom: 10px; border-left: 5px solid; 
-    }}
-    .metric-title {{ font-size: 10px; font-weight: bold; text-transform: uppercase; }}
-    .metric-value {{ font-size: 16px; color: #212529; font-weight: bold; }}
+    }
+    .metric-title { font-size: 10px; font-weight: bold; text-transform: uppercase; }
+    .metric-value { font-size: 16px; color: #212529; font-weight: bold; }
     </style>
 """, unsafe_allow_html=True)
+
+# Injeção do Manifesto PWA (Mantido com f-string apenas aqui)
+st.markdown(f'<link rel="manifest" href="data:application/manifest+json;base64,{b64_manifest}">', unsafe_allow_html=True)
 
 # --- CONFIGURAÇÃO DA API ---
 SCOPE = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
@@ -116,7 +118,6 @@ df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
 colunas_financeiras = ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']
 totais = df_mes[colunas_financeiras].sum() if not df_mes.empty else pd.Series(0, index=colunas_financeiras)
 
-# Métricas
 cols = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
 cores = {'Total': '#007bff', 'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'Próximo mês': '#636EFA', 'Uber': '#EA4335'}
@@ -128,7 +129,6 @@ for i, (titulo, col) in enumerate(metricas):
             <div class="metric-value">R$ {totais[col]:,.0f}</div>
         </div>''', unsafe_allow_html=True)
 
-# Tabs e Formulário
 tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 with tab1:
     with st.form("form_registro", clear_on_submit=True):
@@ -137,6 +137,5 @@ with tab1:
         dinheiro_input = st.number_input("Dinheiro (R$)", value=None, step=10.0, placeholder="0.00")
         pix_input = st.number_input("Pix (R$)", value=None, step=10.0, placeholder="0.00")
         uber_input = st.number_input("Uber (R$)", step=5.0, value=None, placeholder="0.00")
-        
         if st.form_submit_button("SALVAR"):
             st.success("Dados processados!")
