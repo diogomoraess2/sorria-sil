@@ -82,6 +82,23 @@ st.markdown("""
         background-color: #f7fdf3 !important;
         border: 1px solid #d0e8d0 !important;
     }
+
+/* Cor dos títulos das abas */
+    button[data-baseweb="tab"] {
+        color: #4a90e2 !important; /* Cor do texto quando inativo */
+        font-weight: 600 !important;
+    }
+
+    /* Cor do título da aba quando selecionada */
+    button[data-baseweb="tab"][aria-selected="true"] {
+        color: #f5a623 !important; /* Cor do texto quando a aba está ativa */
+    }
+
+    /* Cor da linha de destaque abaixo da aba ativa */
+    div[data-baseweb="tab-highlight"] {
+        background-color: #f5a623 !important;
+    }
+
     </style>
 """, unsafe_allow_html=True)
 
