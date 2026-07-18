@@ -46,7 +46,6 @@ st.markdown("""
         text-shadow: 0 0 10px #00e6ff; color: #ffffff; 
         margin-bottom: 15px; display: block;
     }
-    /* Estilo robusto para os cards */
     .metric-card { 
         background-color: #f8f9fa; padding: 10px; border-radius: 10px; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; 
@@ -54,7 +53,7 @@ st.markdown("""
         display: flex; flex-direction: column; align-items: center;
     }
     .metric-title { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; color: #6c757d; }
-    .metric-value { font-size: 16px; color: #212529; font-weight: 900; }
+    .metric-value { font-size: 15px; color: #212529; font-weight: 900; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -115,18 +114,21 @@ df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
 colunas_financeiras = ['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']
 totais = df_mes[colunas_financeiras].sum() if not df_mes.empty else pd.Series(0, index=colunas_financeiras)
 
-# Métricas com estrutura HTML melhorada
+# Métricas com formatação de moeda brasileira
 cols = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
 cores = {'Total': '#007bff', 'Dinheiro': '#25D366', 'Pix': '#FBBC05', 'Próximo mês': '#636EFA', 'Uber': '#EA4335'}
 
 for i, (titulo, col) in enumerate(metricas):
     with cols[i]:
-        # Adicionado style explícito para garantir a cor e visibilidade
+        # Formatação manual para garantir padrão R$ 1.234,56
+        valor = totais[col]
+        valor_formatado = f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        
         st.markdown(f'''
             <div class="metric-card" style="border-left-color: {cores.get(col, '#007bff')};">
                 <div class="metric-title">{titulo}</div>
-                <div class="metric-value">R$ {totais[col]:,.0f}</div>
+                <div class="metric-value">{valor_formatado}</div>
             </div>
         ''', unsafe_allow_html=True)
 
