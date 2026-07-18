@@ -126,8 +126,20 @@ with tab1:
         
         if st.form_submit_button("SALVAR"):
             if total_input is not None:
+                # Cálculo automático do "Próximo mês" (A Receber)
+                valor_dinheiro = dinheiro_input or 0
+                valor_pix = pix_input or 0
+                valor_receber = total_input - valor_dinheiro - valor_pix
+                
                 if conn:
-                    nova_linha = [data_input.strftime('%d/%m/%Y'), total_input or 0, dinheiro_input or 0, pix_input or 0, 0.0, uber_input or 0]
+                    nova_linha = [
+                        data_input.strftime('%d/%m/%Y'), 
+                        total_input, 
+                        valor_dinheiro, 
+                        valor_pix, 
+                        valor_receber, # Agora calcula o que falta
+                        uber_input or 0
+                    ]
                     conn.write(URL_PLANILHA, MESES_PT[st.session_state['mes_atual_num']], nova_linha)
                     st.success("Dados salvos!")
                     st.rerun()
