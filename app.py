@@ -28,7 +28,7 @@ b64_manifest = base64.b64encode(manifest_json.encode()).decode()
 
 st.set_page_config(
     page_title="Controle Financeiro - Sorria Sil",
-    page_icon="🦷",
+    page_icon="static/icon.png",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
