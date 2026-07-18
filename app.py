@@ -34,6 +34,7 @@ st.set_page_config(
 )
 
 # --- INJEÇÃO DE CSS (ESTILO EASYNOTES + BACKGROUND QUADRICULADO) ---
+
 st.markdown("""
     <style>
     /* Aplica a imagem de fundo quadriculada */
@@ -48,16 +49,13 @@ st.markdown("""
     }
     .block-container { padding-top: 0.5rem !important; }
     
-    /* Título sóbrio */
     h1 { font-family: 'Segoe UI', sans-serif !important; margin-bottom: 20px !important; }
 
-    /* Estilo de texto do mês */
     .mes-clean { 
         font-weight: 600; font-size: 28px !important; 
         color: #333 !important; margin-bottom: 15px; display: block;
     }
     
-    /* Cards estilo EasyNotes com transparência */
     .metric-card { 
         background-color: rgba(255, 255, 255, 0.85) !important; 
         padding: 15px; border-radius: 12px; 
@@ -66,39 +64,31 @@ st.markdown("""
         border-left: 6px solid; 
         display: flex; flex-direction: column; align-items: center;
     }
-    .metric-title { 
-        font-size: 13px !important; font-weight: 700; text-transform: uppercase; 
-        margin-bottom: 5px; color: #555 !important; 
-    }
+    .metric-title { font-size: 13px !important; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; color: #555 !important; }
     .metric-value { font-size: 22px !important; font-weight: 700; color: #222 !important; }
     
-    /* Ajuste de labels e textos */
     .stSelectbox label, .stDateInput label, .stNumberInput label, .stMarkdown p {
         color: #222222 !important; font-weight: 500;
     }
 
-    /* Ajuste de fundo da caixa de seleção do mês */
     div[data-baseweb="select"] > div {
         background-color: #f7fdf3 !important;
         border: 1px solid #d0e8d0 !important;
     }
 
-/* Cor dos títulos das abas */
-    button[data-baseweb="tab"] {
-        color: #222222 !important; /* Cor do texto quando inativo */
+    /* CORREÇÃO PARA AS ABAS */
+    .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
+        color: #222222 !important;
         font-weight: 600 !important;
     }
 
-    /* Cor do título da aba quando selecionada */
-    button[data-baseweb="tab"][aria-selected="true"] {
-        color: #f5a623 !important; /* Cor do texto quando a aba está ativa */
+    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] [data-testid="stMarkdownContainer"] p {
+        color: #f5a623 !important;
     }
 
-    /* Cor da linha de destaque abaixo da aba ativa */
-    div[data-baseweb="tab-highlight"] {
+    .stTabs [data-baseweb="tab-highlight"] {
         background-color: #f5a623 !important;
     }
-
     </style>
 """, unsafe_allow_html=True)
 
