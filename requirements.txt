@@ -3,3 +3,9 @@ pandas
 plotly
 st-theme
 st-gsheets-connection
+streamlit
+pandas
+plotly
+gspread
+google-auth
+google-auth-oauthlib
