@@ -148,20 +148,26 @@ tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 with tab1:
     with st.form("form_registro", clear_on_submit=True):
         data = st.date_input("Data")
-        total = st.number_input("Total Diária (R$)", step=10.0, key="total_input")
-        dinheiro = st.number_input("Dinheiro (R$)", step=10.0, key="dinheiro_input")
-        pix = st.number_input("Pix (R$)", step=10.0, key="pix_input")
-        uber = st.number_input("Uber (R$)", step=5.0, key="uber_input")
         
-        valor_a_receber = max(0.0, st.session_state.get("total_input", 0) - 
-                              (st.session_state.get("dinheiro_input", 0) + 
-                               st.session_state.get("pix_input", 0)))
+        # Alterado: value=None inicia o campo vazio
+        total = st.number_input("Total Diária (R$)", step=10.0, value=None, key="total_input")
+        dinheiro = st.number_input("Dinheiro (R$)", step=10.0, value=None, key="dinheiro_input")
+        pix = st.number_input("Pix (R$)", step=10.0, value=None, key="pix_input")
+        uber = st.number_input("Uber (R$)", step=5.0, value=None, key="uber_input")
+        
+        # Lógica de cálculo tratando o valor None como 0
+        t = st.session_state.get("total_input") or 0
+        d = st.session_state.get("dinheiro_input") or 0
+        p = st.session_state.get("pix_input") or 0
+        
+        valor_a_receber = max(0.0, t - (d + p))
         
         st.markdown(f"**Valor a Receber (Próximo mês):** R$ {valor_a_receber:,.2f}")
         
         if st.form_submit_button("SALVAR"):
+            # Garantindo que se o usuário deixar em branco, o banco receba 0
             conn.write(URL_PLANILHA, MESES_PT[st.session_state['mes_atual_num']], 
-                       [str(data), total, dinheiro, pix, valor_a_receber, uber])
+                       [str(data), t, d, p, valor_a_receber, (st.session_state.get("uber_input") or 0)])
             st.success("Dados salvos!")
 
 with tab2:
