@@ -155,17 +155,25 @@ with tab2:
 
 with tab3:
     if not df_mes.empty:
-        # Incluído 'Próximo mês' na lista de valores e nomes
         colunas_grafico = ['Dinheiro', 'Pix', 'Uber', 'Próximo mês']
         valores_grafico = totais[colunas_grafico]
+        
+        # Mapeamento de cores seguindo os cards
+        cores_map = {
+            'Dinheiro': '#25D366', 
+            'Pix': '#FBBC05', 
+            'Uber': '#EA4335', 
+            'Próximo mês': '#636EFA'
+        }
         
         fig = px.pie(
             values=valores_grafico, 
             names=colunas_grafico, 
-            title="Distribuição de Receitas (Incluindo A Receber)"
+            title="Distribuição de Receitas",
+            color=colunas_grafico,
+            color_discrete_map=cores_map
         )
         
-        # Ajuste para garantir que o gráfico não fique enorme
         fig.update_layout(margin=dict(t=40, b=0, l=0, r=0))
         st.plotly_chart(fig, use_container_width=True)
     else:
