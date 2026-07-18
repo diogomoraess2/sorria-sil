@@ -117,17 +117,32 @@ tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 
 with tab1:
     with st.form("form_registro", clear_on_submit=True):
-        data_input = st.date_input("Data")
-        total_input = st.number_input("Total (R$)", step=10.0)
-        dinheiro_input = st.number_input("Dinheiro (R$)", step=10.0)
-        pix_input = st.number_input("Pix (R$)", step=10.0)
-        uber_input = st.number_input("Uber (R$)", step=5.0)
+        data_input = st.date_input("Data", value=datetime.today())
+        
+        # O value=None remove o 0.00, e o placeholder orienta o usuário
+        total_input = st.number_input("Total (R$)", value=None, step=10.0, placeholder="0.00")
+        dinheiro_input = st.number_input("Dinheiro (R$)", value=None, step=10.0, placeholder="0.00")
+        pix_input = st.number_input("Pix (R$)", value=None, step=10.0, placeholder="0.00")
+        uber_input = st.number_input("Uber (R$)", step=5.0, value=None, placeholder="0.00")
+        
         if st.form_submit_button("SALVAR"):
-            if conn:
-                nova_linha = [data_input.strftime('%d/%m/%Y'), total_input, dinheiro_input, pix_input, 0.0, uber_input]
-                conn.write(URL_PLANILHA, MESES_PT[st.session_state['mes_atual_num']], nova_linha)
-                st.success("Dados salvos!")
-                st.rerun()
+            # Lógica de validação para evitar salvar valores nulos (caso o usuário esqueça de preencher)
+            if total_input is not None:
+                if conn:
+                    # Se o campo estiver vazio, usamos 0 como fallback para o cálculo
+                    nova_linha = [
+                        data_input.strftime('%d/%m/%Y'), 
+                        total_input or 0, 
+                        dinheiro_input or 0, 
+                        pix_input or 0, 
+                        0.0, 
+                        uber_input or 0
+                    ]
+                    conn.write(URL_PLANILHA, MESES_PT[st.session_state['mes_atual_num']], nova_linha)
+                    st.success("Dados salvos!")
+                    st.rerun()
+            else:
+                st.warning("Por favor, preencha pelo menos o campo Total.")
 
 with tab2:
     st.dataframe(df_mes, use_container_width=True, hide_index=True)
