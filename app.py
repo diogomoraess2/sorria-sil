@@ -74,7 +74,7 @@ st.markdown("""
     
     /* Ajuste de labels e textos */
     .stSelectbox label, .stDateInput label, .stNumberInput label, .stMarkdown p {
-        color: #4a90e2 !important; font-weight: 500;
+        color: #222222 !important; font-weight: 500;
     }
 
     /* Ajuste de fundo da caixa de seleção do mês */
