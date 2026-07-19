@@ -60,6 +60,7 @@ st.markdown("""
         border: 1px solid #d0e8d0;
         border-left: 6px solid; 
         display: flex; flex-direction: column; align-items: center;
+	margin-botton: 5px;
     }
     .metric-title { font-size: 13px !important; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; color: #555 !important; }
     .metric-value { font-size: 20px !important; font-weight: 700; color: #222 !important; }
