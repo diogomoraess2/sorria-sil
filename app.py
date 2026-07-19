@@ -184,8 +184,9 @@ with tab1:
         valor_a_receber = max(0.0, t - (d + p))
         st.markdown(f"**Valor a Receber:** R$ {valor_a_receber:,.2f}")
         if st.form_submit_button("SALVAR"):
+            data_formatada = data.strftime("%d/%m/%Y") 
             conn.write(URL_PLANILHA, MESES_PT[st.session_state['mes_atual_num']], 
-                       [str(data), t, d, p, valor_a_receber, (st.session_state.get("uber_input") or 0)])
+                       [data_formatada, t, d, p, valor_a_receber, (st.session_state.get("uber_input") or 0)])
             st.success("Dados salvos!")
 
 with tab2:
