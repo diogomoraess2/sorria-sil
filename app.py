@@ -5,6 +5,7 @@ from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 import base64
+import streamlit.components.v1 as components
 
 # --- CONFIGURAÇÃO PWA ---
 manifest_json = """
@@ -33,9 +34,9 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- INJEÇÃO DE CSS (ESTILO EASYNOTES + BACKGROUND QUADRICULADO) ---
-st.markdown("""
-    <style>
+# --- INJEÇÃO DE CSS FORÇADO ---
+components.html("""
+<style>
     /* Aplica a imagem de fundo quadriculada */
     .stApp {
         background-image: url('https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/quadro-verde.jpg');
@@ -77,13 +78,31 @@ st.markdown("""
         color: #222 !important; font-weight: 500;
     }
 
-    /* Ajuste de fundo da caixa de seleção do mês */
+    /* Fundo e texto da caixa de seleção do mês */
     div[data-baseweb="select"] > div {
         background-color: #ffffff !important;
         border: 1px solid #d0e8d0 !important;
     }
-    </style>
-""", unsafe_allow_html=True)
+    div[data-baseweb="select"] span {
+        color: #222222 !important;
+    }
+    div[data-baseweb="select"] svg {
+        fill: #222222 !important;
+    }
+    
+    /* Força a cor das abas */
+    button[data-baseweb="tab"] {
+        color: #222222 !important;
+        font-weight: 600 !important;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] {
+        color: #f5a623 !important;
+    }
+    div[data-baseweb="tab-highlight"] {
+        background-color: #f5a623 !important;
+    }
+</style>
+""", height=0)
 
 st.markdown(f'<link rel="manifest" href="data:application/manifest+json;base64,{b64_manifest}">', unsafe_allow_html=True)
 st.markdown('<link rel="shortcut icon" href="https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/icon.png">', unsafe_allow_html=True)
