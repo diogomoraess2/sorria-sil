@@ -173,7 +173,8 @@ tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 
 with tab1:
     with st.form("form_registro", clear_on_submit=True):
-        data = st.date_input("Data")
+        # Ajuste de formato da máscara de data
+        data = st.date_input("Data", format="DD/MM/YYYY")
         total = st.number_input("Total Diária (R$)", step=10.0, value=None, key="total_input")
         dinheiro = st.number_input("Dinheiro (R$)", step=10.0, value=None, key="dinheiro_input")
         pix = st.number_input("Pix (R$)", step=10.0, value=None, key="pix_input")
