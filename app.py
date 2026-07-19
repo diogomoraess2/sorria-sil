@@ -34,73 +34,33 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- INJEÇÃO DE CSS FORÇADO ---
+# --- INJEÇÃO DE CSS ---
+# Ajustado para manter o menu superior visível e forçar cores consistentes
 components.html("""
 <style>
-    /* Aplica a imagem de fundo quadriculada */
     .stApp {
         background-image: url('https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/quadro-verde.jpg');
         background-size: cover;
         background-attachment: fixed;
     }
-    
-    [data-testid="stHeader"], footer, #MainMenu, .stAppDeployButton, .viewerBadge_container__1QSob {
-        display: none !important;
-    }
     .block-container { padding-top: 0.5rem !important; }
-    
-    /* Título sóbrio */
     h1 { font-family: 'Segoe UI', sans-serif !important; margin-bottom: 20px !important; }
-
-    /* Estilo de texto do mês */
-    .mes-clean { 
-        font-weight: 600; font-size: 28px !important; 
-        color: #333 !important; margin-bottom: 15px; display: block;
-    }
+    .mes-clean { font-weight: 600; font-size: 28px !important; color: #333 !important; margin-bottom: 15px; display: block; }
     
-    /* Cards estilo EasyNotes com transparência */
     .metric-card { 
-        background-color: rgba(255, 255, 255, 0.85) !important; 
+        background-color: rgba(255, 255, 255, 0.95) !important; 
         padding: 15px; border-radius: 12px; 
-        box-shadow: 0 2px 4px rgba(0,0,0,0.08); text-align: center; 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; 
         border: 1px solid #d0e8d0;
         border-left: 6px solid; 
         display: flex; flex-direction: column; align-items: center;
     }
-    .metric-title { 
-        font-size: 13px !important; font-weight: 700; text-transform: uppercase; 
-        margin-bottom: 5px; color: #555 !important; 
-    }
-    .metric-value { font-size: 22px !important; font-weight: 700; color: #222 !important; }
+    .metric-title { font-size: 13px !important; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; color: #555 !important; }
+    .metric-value { font-size: 20px !important; font-weight: 700; color: #222 !important; }
     
-    /* Ajuste de labels e textos */
-    .stSelectbox label, .stDateInput label, .stNumberInput label, .stMarkdown p {
-        color: #222 !important; font-weight: 500;
-    }
-
-    /* Fundo e texto da caixa de seleção do mês */
-    div[data-baseweb="select"] > div {
-        background-color: #ffffff !important;
-        border: 1px solid #d0e8d0 !important;
-    }
-    div[data-baseweb="select"] span {
-        color: #222222 !important;
-    }
-    div[data-baseweb="select"] svg {
-        fill: #222222 !important;
-    }
-    
-    /* Força a cor das abas */
-    button[data-baseweb="tab"] {
-        color: #222222 !important;
-        font-weight: 600 !important;
-    }
-    button[data-baseweb="tab"][aria-selected="true"] {
-        color: #f5a623 !important;
-    }
-    div[data-baseweb="tab-highlight"] {
-        background-color: #f5a623 !important;
-    }
+    /* Ajuste da caixa de seleção */
+    div[data-baseweb="select"] > div { background-color: #ffffff !important; border: 1px solid #d0e8d0 !important; }
+    div[data-baseweb="select"] span { color: #222222 !important; }
 </style>
 """, height=0)
 
@@ -137,6 +97,15 @@ def get_connection():
 conn = get_connection()
 MESES_PT = {1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto', 9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'}
 
+# --- Mapeamento Unificado de Cores ---
+cores_map = {
+    'Total': '#4a90e2', 
+    'Dinheiro': '#7ed321', 
+    'Pix': '#f5a623', 
+    'Próximo mês': '#9013fe', 
+    'Uber': '#d0021b'
+}
+
 # --- LÓGICA E INTERFACE ---
 if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = datetime.today().month
 
@@ -167,21 +136,14 @@ def carregar_dados_mes(aba):
 df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
 totais = df_mes[['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']].sum() if not df_mes.empty else pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
-# Métricas com Cores Estilo EasyNotes
+# --- Exibição dos Cards ---
 cols = st.columns(5)
 metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
-cores = {
-    'Total': '#4a90e2', 
-    'Dinheiro': '#7ed321', 
-    'Pix': '#f5a623', 
-    'Próximo mês': '#9013fe', 
-    'Uber': '#d0021b'
-}
 
 for i, (titulo, col) in enumerate(metricas):
     with cols[i]:
         valor_formatado = f"R$ {totais[col]:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-        cor_hex = cores.get(col, '#4a90e2')
+        cor_hex = cores_map.get(col, '#4a90e2')
         st.markdown(f'''<div class="metric-card" style="border-left-color: {cor_hex};">
             <div class="metric-title">{titulo}</div>
             <div class="metric-value">{valor_formatado}</div>
@@ -192,7 +154,6 @@ tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 
 with tab1:
     with st.form("form_registro", clear_on_submit=True):
-        # Ajuste de formato da máscara de data
         data = st.date_input("Data", format="DD/MM/YYYY")
         total = st.number_input("Total Diária (R$)", step=10.0, value=None, key="total_input")
         dinheiro = st.number_input("Dinheiro (R$)", step=10.0, value=None, key="dinheiro_input")
@@ -216,12 +177,10 @@ with tab3:
     if not df_mes.empty:
         colunas_grafico = ['Dinheiro', 'Pix', 'Uber', 'Próximo mês']
         valores_grafico = totais[colunas_grafico]
-        cores_map = {'Dinheiro': '#7ed321', 'Pix': '#f5a623', 'Uber': '#d0021b', 'Próximo mês': '#9013fe'}
         
         fig = px.pie(values=valores_grafico, names=colunas_grafico, title="Distribuição de Receitas",
                      color=colunas_grafico, color_discrete_map=cores_map)
         
-        # Gráfico com tema claro e limpo
         fig.update_layout(template="plotly_white", margin=dict(t=40, b=0, l=0, r=0))
         st.plotly_chart(fig, use_container_width=True)
     else:
