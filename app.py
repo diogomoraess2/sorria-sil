@@ -47,7 +47,11 @@ st.markdown("""
     footer { display: none !important; }
     
     .block-container { padding-top: 0.5rem !important; }
+    
     h1 { font-family: 'Segoe UI', sans-serif !important; margin-bottom: 20px !important; }
+    
+    /* Remove o ícone de link do cabeçalho */
+    h1 a { display: none !important; }
     
     .mes-clean { font-weight: 600; font-size: 28px !important; color: #333 !important; margin-bottom: 15px; display: block; }
     
