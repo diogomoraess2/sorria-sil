@@ -205,14 +205,21 @@ with tab3:
         fig = px.pie(values=valores_grafico, names=colunas_grafico, title="Distribuição de Receitas",
                      color=colunas_grafico, color_discrete_map=cores_map)
         
-        # AJUSTE AQUI: Adiciona os valores e formata o texto
-        # Ajuste para exibir: Nome, depois Valor, depois Porcentagem
+        # FORÇAR O TEXTO DENTRO E OTIMIZAR ESPAÇO
         fig.update_traces(
             textinfo='label+value+percent', 
-            texttemplate='%{label}<br>R$ %{value:,.2f}<br>(%{percent:.1%})'
+            texttemplate='%{label}<br>R$ %{value:,.2f}<br>(%{percent:.1%})',
+            insidetextorientation='radial', # Tenta alinhar o texto radialmente para caber melhor
+            insidetextfont=dict(size=11)    # Reduz levemente a fonte para garantir que caiba
         )
         
-        fig.update_layout(template="plotly_white", margin=dict(t=40, b=0, l=0, r=0))
+        # Ajusta as margens para dar mais espaço ao gráfico e evita cortes
+        fig.update_layout(
+            template="plotly_white", 
+            margin=dict(t=50, b=50, l=20, r=20),
+            showlegend=False # Esconde a legenda lateral para ganhar espaço para a pizza
+        )
+        
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("Nenhum dado para exibir.")
