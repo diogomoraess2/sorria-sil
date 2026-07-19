@@ -34,7 +34,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- INJEÇÃO DE CSS (MODO COMPATÍVEL) ---
+# --- INJEÇÃO DE CSS ---
 st.markdown("""
     <style>
     /* Fundo quadriculado */
@@ -44,10 +44,8 @@ st.markdown("""
         background-attachment: fixed;
     }
     
-    /* Removemos a linha que escondia o header para manter o menu de temas visível */
-    footer, #MainMenu, .stAppDeployButton, .viewerBadge_container__1QSob {
-        display: none !important;
-    }
+    /* Removemos apenas elementos que não são o menu principal */
+    footer { display: none !important; }
     
     .block-container { padding-top: 0.5rem !important; }
     h1 { font-family: 'Segoe UI', sans-serif !important; margin-bottom: 20px !important; }
@@ -66,7 +64,7 @@ st.markdown("""
     .metric-title { font-size: 13px !important; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; color: #555 !important; }
     .metric-value { font-size: 20px !important; font-weight: 700; color: #222 !important; }
     
-    /* Força a cor do Selectbox mesmo em modo Dark */
+    /* Força a cor do Selectbox */
     [data-baseweb="select"] > div {
         background-color: #ffffff !important;
         border: 1px solid #d0e8d0 !important;
