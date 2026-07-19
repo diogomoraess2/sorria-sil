@@ -44,7 +44,6 @@ st.markdown("""
         background-attachment: fixed;
     }
     
-    /* Removemos apenas elementos que não são o menu principal */
     footer { display: none !important; }
     
     .block-container { padding-top: 0.5rem !important; }
@@ -55,13 +54,21 @@ st.markdown("""
     /* Cards */
     .metric-card { 
         background-color: rgba(255, 255, 255, 0.95) !important; 
-        padding: 5px; border-radius: 12px; 
+        padding: 15px; border-radius: 12px; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; 
         border: 1px solid #d0e8d0;
         border-left: 6px solid; 
         display: flex; flex-direction: column; align-items: center;
-	margin-botton: 5px;
+        margin-bottom: 10px; /* Espaçamento padrão para todos */
     }
+    
+    /* MEDIA QUERY PARA CELULAR */
+    @media (max-width: 640px) {
+        .metric-card {
+            margin-bottom: 20px !important; /* Aumenta o espaçamento quando empilhados */
+        }
+    }
+
     .metric-title { font-size: 13px !important; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; color: #555 !important; }
     .metric-value { font-size: 20px !important; font-weight: 700; color: #222 !important; }
     
