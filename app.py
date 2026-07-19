@@ -195,12 +195,7 @@ with tab1:
             st.success("Dados salvos!")
 
 with tab2:
-    # Aplica um estilo básico de borda usando o Pandas Styler
-    st_df = df_mes.style.set_properties(**{
-        'border': '1px solid #d0e8d0',
-        'text-align': 'center'
-    })
-    st.dataframe(st_df, use_container_width=True)
+    st.dataframe(df_mes, use_container_width=True)
 
 with tab3:
     if not df_mes.empty:
