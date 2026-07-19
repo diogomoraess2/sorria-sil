@@ -59,7 +59,7 @@ st.markdown("""
         border: 1px solid #d0e8d0;
         border-left: 6px solid; 
         display: flex; flex-direction: column; align-items: center;
-        margin-bottom: 5px; /* Espaçamento padrão para todos */
+        margin-bottom: 1px; /* Espaçamento padrão para todos */
     }
     
     /* MEDIA QUERY PARA CELULAR */
