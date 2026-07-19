@@ -205,6 +205,9 @@ with tab3:
         fig = px.pie(values=valores_grafico, names=colunas_grafico, title="Distribuição de Receitas",
                      color=colunas_grafico, color_discrete_map=cores_map)
         
+        # AJUSTE AQUI: Adiciona os valores e formata o texto
+        fig.update_traces(textinfo='label+percent+value', texttemplate='%{label}<br>R$ %{value:,.2f}')
+        
         fig.update_layout(template="plotly_white", margin=dict(t=40, b=0, l=0, r=0))
         st.plotly_chart(fig, use_container_width=True)
     else:
