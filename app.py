@@ -34,19 +34,27 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- INJEÇÃO DE CSS ---
-# Ajustado para manter o menu superior visível e forçar cores consistentes
-components.html("""
-<style>
+# --- INJEÇÃO DE CSS (MODO COMPATÍVEL) ---
+st.markdown("""
+    <style>
+    /* Fundo quadriculado */
     .stApp {
         background-image: url('https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/quadro-verde.jpg');
         background-size: cover;
         background-attachment: fixed;
     }
+    
+    /* Removemos a linha que escondia o header para manter o menu de temas visível */
+    footer, #MainMenu, .stAppDeployButton, .viewerBadge_container__1QSob {
+        display: none !important;
+    }
+    
     .block-container { padding-top: 0.5rem !important; }
     h1 { font-family: 'Segoe UI', sans-serif !important; margin-bottom: 20px !important; }
+    
     .mes-clean { font-weight: 600; font-size: 28px !important; color: #333 !important; margin-bottom: 15px; display: block; }
     
+    /* Cards */
     .metric-card { 
         background-color: rgba(255, 255, 255, 0.95) !important; 
         padding: 15px; border-radius: 12px; 
@@ -58,11 +66,17 @@ components.html("""
     .metric-title { font-size: 13px !important; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; color: #555 !important; }
     .metric-value { font-size: 20px !important; font-weight: 700; color: #222 !important; }
     
-    /* Ajuste da caixa de seleção */
-    div[data-baseweb="select"] > div { background-color: #ffffff !important; border: 1px solid #d0e8d0 !important; }
-    div[data-baseweb="select"] span { color: #222222 !important; }
-</style>
-""", height=0)
+    /* Força a cor do Selectbox mesmo em modo Dark */
+    [data-baseweb="select"] > div {
+        background-color: #ffffff !important;
+        border: 1px solid #d0e8d0 !important;
+        color: #222222 !important;
+    }
+    [data-baseweb="select"] span {
+        color: #222222 !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 st.markdown(f'<link rel="manifest" href="data:application/manifest+json;base64,{b64_manifest}">', unsafe_allow_html=True)
 st.markdown('<link rel="shortcut icon" href="https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/icon.png">', unsafe_allow_html=True)
