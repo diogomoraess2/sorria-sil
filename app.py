@@ -35,7 +35,6 @@ st.set_page_config(
 )
 
 # --- INJEÇÃO DE CSS ---
-# --- INJEÇÃO DE CSS COM BACKGROUND FINANCEIRO ---
 st.markdown("""
     <style>
     /* Oculta o menu superior (hambúrguer), o cabeçalho e o rodapé do Streamlit */
@@ -43,10 +42,10 @@ st.markdown("""
     header {visibility: hidden;}
     footer { display: none !important; }
     
-    /* Fundo com padrão sutil de símbolos financeiros e fundo branco */
+    /* Fundo branco com padrão visível de símbolos financeiros */
     .stApp {
         background-color: #ffffff;
-        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%234a90e2' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ctext x='10' y='20' font-family='sans-serif' font-size='14'%3E$%3C/text%3E%3Ctext x='35' y='45' font-family='sans-serif' font-size='12'%3E%25%3C/text%3E%3C/g%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%234a90e2' fill-opacity='0.08' font-family='sans-serif' font-weight='bold'%3E%3Ctext x='15' y='30' font-size='16'%3E$%3C/text%3E%3Ctext x='65' y='75' font-size='14'%3E%25%3C/text%3E%3Ctext x='40' y='50' font-size='12'%3ER%24%3C/text%3E%3C/g%3E%3C/svg%3E");
     }
     
     .block-container { padding-top: 0.5rem !important; }
