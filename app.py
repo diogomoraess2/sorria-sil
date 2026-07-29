@@ -35,16 +35,20 @@ st.set_page_config(
 )
 
 # --- INJEÇÃO DE CSS ---
+# --- INJEÇÃO DE CSS ---
 st.markdown("""
     <style>
+    /* Oculta o menu superior (hambúrguer), o cabeçalho e o rodapé do Streamlit */
+    #MainMenu {visibility: hidden;}
+    header {visibility: hidden;}
+    footer { display: none !important; }
+    
     /* Fundo quadriculado */
     .stApp {
         background-image: url('https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/quadro-verde.jpg');
         background-size: cover;
         background-attachment: fixed;
     }
-    
-    footer { display: none !important; }
     
     .block-container { padding-top: 0.5rem !important; }
     
@@ -63,13 +67,13 @@ st.markdown("""
         border: 1px solid #d0e8d0;
         border-left: 6px solid; 
         display: flex; flex-direction: column; align-items: center;
-        margin-bottom: 10px; /* Espaçamento padrão para todos */
+        margin-bottom: 10px;
     }
     
     /* MEDIA QUERY PARA CELULAR */
     @media (max-width: 640px) {
         .metric-card {
-            margin-bottom: 20px !important; /* Aumenta o espaçamento quando empilhados */
+            margin-bottom: 20px !important;
         }
     }
 
