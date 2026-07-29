@@ -126,6 +126,7 @@ cores_map = {
     'Total': '#4a90e2', 
     'Dinheiro': '#7ed321', 
     'Pix': '#f5a623', 
+    'Dinheiro + Pix': '#20b2aa', 
     'Próximo mês': '#9013fe', 
     'Uber': '#d0021b'
 }
@@ -161,13 +162,26 @@ df_mes = carregar_dados_mes(MESES_PT[st.session_state['mes_atual_num']])
 totais = df_mes[['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber']].sum() if not df_mes.empty else pd.Series(0, index=['Total', 'Dinheiro', 'Pix', 'Próximo mês', 'Uber'])
 
 # --- Exibição dos Cards ---
-cols = st.columns(5)
-metricas = [("Total", "Total"), ("Dinheiro", "Dinheiro"), ("Pix", "Pix"), ("A Receber", "Próximo mês"), ("Uber", "Uber")]
+cols = st.columns(6)
+metricas = [
+    ("Total", "Total"), 
+    ("Dinheiro", "Dinheiro"), 
+    ("Pix", "Pix"), 
+    ("Dinheiro + Pix", "Dinheiro_Pix"), 
+    ("A Receber", "Próximo mês"), 
+    ("Uber", "Uber")
+]
 
 for i, (titulo, col) in enumerate(metricas):
     with cols[i]:
-        valor_formatado = f"R$ {totais[col]:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-        cor_hex = cores_map.get(col, '#4a90e2')
+        if col == "Dinheiro_Pix":
+            valor_soma = totais.get('Dinheiro', 0) + totais.get('Pix', 0)
+            valor_formatado = f"R$ {valor_soma:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+            cor_hex = cores_map.get('Dinheiro + Pix', '#20b2aa')
+        else:
+            valor_formatado = f"R$ {totais[col]:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+            cor_hex = cores_map.get(col, '#4a90e2')
+            
         st.markdown(f'''<div class="metric-card" style="border-left-color: {cor_hex};">
             <div class="metric-title">{titulo}</div>
             <div class="metric-value">{valor_formatado}</div>
