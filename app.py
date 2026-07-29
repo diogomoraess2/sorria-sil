@@ -35,7 +35,7 @@ st.set_page_config(
 )
 
 # --- INJEÇÃO DE CSS ---
-# --- INJEÇÃO DE CSS ---
+# --- INJEÇÃO DE CSS COM BACKGROUND FINANCEIRO ---
 st.markdown("""
     <style>
     /* Oculta o menu superior (hambúrguer), o cabeçalho e o rodapé do Streamlit */
@@ -43,11 +43,10 @@ st.markdown("""
     header {visibility: hidden;}
     footer { display: none !important; }
     
-    /* Fundo quadriculado */
+    /* Fundo com padrão sutil de símbolos financeiros e fundo branco */
     .stApp {
-        background-image: url('https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/quadro-verde.jpg');
-        background-size: cover;
-        background-attachment: fixed;
+        background-color: #ffffff;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%234a90e2' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ctext x='10' y='20' font-family='sans-serif' font-size='14'%3E$%3C/text%3E%3Ctext x='35' y='45' font-family='sans-serif' font-size='12'%3E%25%3C/text%3E%3C/g%3E%3C/svg%3E");
     }
     
     .block-container { padding-top: 0.5rem !important; }
@@ -63,8 +62,8 @@ st.markdown("""
     .metric-card { 
         background-color: rgba(255, 255, 255, 0.95) !important; 
         padding: 5px; border-radius: 12px; 
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; 
-        border: 1px solid #d0e8d0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08); text-align: center; 
+        border: 1px solid #e0e0e0;
         border-left: 6px solid; 
         display: flex; flex-direction: column; align-items: center;
         margin-bottom: 10px;
