@@ -191,6 +191,31 @@ for i, (titulo, col) in enumerate(metricas):
             <div class="metric-value">{valor_formatado}</div>
             </div>''', unsafe_allow_html=True)
 
+
+# --- ABAS ---
+tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
+
+with tab1:
+    with st.form("form_registro", clear_on_submit=True):
+        data = st.date_input("Data", format="DD/MM/YYYY")
+        total = st.number_input("Total Diária (R$)", step=10.0, value=None, key="total_input")
+        dinheiro = st.number_input("Dinheiro (R$)", step=10.0, value=None, key="dinheiro_input")
+        pix = st.number_input("Pix (R$)", step=10.0, value=None, key="pix_input")
+        uber = st.number_input("Uber (R$)", step=5.0, value=None, key="uber_input")
+        t = st.session_state.get("total_input") or 0
+        d = st.session_state.get("dinheiro_input") or 0
+        p = st.session_state.get("pix_input") or 0
+        valor_a_receber = max(0.0, t - (d + p))
+        st.markdown(f"**Valor a Receber:** R$ {valor_a_receber:,.2f}")
+        if st.form_submit_button("SALVAR"):
+            data_formatada = data.strftime("%d/%m/%Y") 
+            conn.write(URL_PLANILHA, MESES_PT[st.session_state['mes_atual_num']], 
+                       [data_formatada, t, d, p, valor_a_receber, (st.session_state.get("uber_input") or 0)])
+            st.success("Dados salvos!")
+
+with tab2:
+    st.dataframe(df_mes, use_container_width=True)
+
 with tab3:
     if not df_mes.empty:
         colunas_grafico = ['Dinheiro', 'Pix', 'Uber', 'Próximo mês']
@@ -215,28 +240,3 @@ with tab3:
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("Nenhum dado para exibir.")
-
-
-# --- ABAS ---
-tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
-
-with tab1:
-    with st.form("form_registro", clear_on_submit=True):
-        data = st.date_input("Data", format="DD/MM/YYYY")
-        total = st.number_input("Total Diária (R$)", step=10.0, value=None, key="total_input")
-        dinheiro = st.number_input("Dinheiro (R$)", step=10.0, value=None, key="dinheiro_input")
-        pix = st.number_input("Pix (R$)", step=10.0, value=None, key="inheiro_input")
-        uber = st.number_input("Uber (R$)", step=5.0, value=None, key="uber_input")
-        t = st.session_state.get("total_input") or 0
-        d = st.session_state.get("dinheiro_input") or 0
-        p = st.session_state.get("pix_input") or 0
-        valor_a_receber = max(0.0, t - (d + p))
-        st.markdown(f"**Valor a Receber:** R$ {valor_a_receber:,.2f}")
-        if st.form_submit_button("SALVAR"):
-            data_formatada = data.strftime("%d/%m/%Y") 
-            conn.write(URL_PLANILHA, MESES_PT[st.session_state['mes_atual_num']], 
-                       [data_formatada, t, d, p, valor_a_receber, (st.session_state.get("uber_input") or 0)])
-            st.success("Dados salvos!")
-
-with tab2:
-    st.dataframe(df_mes, use_container_width=True)
