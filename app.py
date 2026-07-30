@@ -191,6 +191,10 @@ for i, (titulo, col) in enumerate(metricas):
             <div class="metric-value">{valor_formatado}</div>
             </div>''', unsafe_allow_html=True)
 
+st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("Nenhum dado para exibir.")
+
 # --- ABAS ---
 tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 
