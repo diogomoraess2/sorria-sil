@@ -145,7 +145,7 @@ if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = 
 
 st.markdown("""
     <h1 style="text-align: center; width: 100%; display: block;">
-        <span style="color: #9b34eb;">Easy</span><span style="color: #eb34c3;">Cash</span>
+        <span style="color: #9b34eb;"> Easy</span><span style="color: #eb34c3;">Cash</span>
     </h1>
 """, unsafe_allow_html=True)
 
