@@ -10,8 +10,8 @@ import streamlit.components.v1 as components
 # --- CONFIGURAÇÃO PWA ---
 manifest_json = """
 {
-  "name": "DentBoard",
-  "short_name": "DentBoard",
+  "name": "Easy Cash",
+  "short_name": "EasyCash",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -28,7 +28,7 @@ manifest_json = """
 b64_manifest = base64.b64encode(manifest_json.encode()).decode()
 
 st.set_page_config(
-    page_title="Controle Financeiro - DentBoard",
+    page_title="Controle Financeiro - Easy Cash",
     page_icon="https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/icon.png", 
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -140,7 +140,7 @@ if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = 
 
 st.markdown("""
     <h1 style="text-align: center; width: 100%; display: block;">
-        <span style="color: #4a90e2;">Dent</span><span style="color: #f5a623;">Board</span>
+        <span style="color: #4a90e2;">Easy</span> <span style="color: #7ed321;">Cash</span>
     </h1>
 """, unsafe_allow_html=True)
 
