@@ -191,9 +191,31 @@ for i, (titulo, col) in enumerate(metricas):
             <div class="metric-value">{valor_formatado}</div>
             </div>''', unsafe_allow_html=True)
 
-st.plotly_chart(fig, use_container_width=True)
+with tab3:
+    if not df_mes.empty:
+        colunas_grafico = ['Dinheiro', 'Pix', 'Uber', 'Próximo mês']
+        valores_grafico = totais[colunas_grafico]
+        
+        fig = px.pie(values=valores_grafico, names=colunas_grafico, title="Distribuição de Receitas",
+                     color=colunas_grafico, color_discrete_map=cores_map)
+        
+        fig.update_traces(
+            textinfo='label+value+percent', 
+            texttemplate='%{label}<br>R$ %{value:,.2f}<br>(%{percent:.1%})',
+            insidetextorientation='radial',
+            insidetextfont=dict(size=11)
+        )
+        
+        fig.update_layout(
+            template="plotly_white", 
+            margin=dict(t=50, b=50, l=20, r=20),
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("Nenhum dado para exibir.")
+
 
 # --- ABAS ---
 tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
@@ -203,7 +225,7 @@ with tab1:
         data = st.date_input("Data", format="DD/MM/YYYY")
         total = st.number_input("Total Diária (R$)", step=10.0, value=None, key="total_input")
         dinheiro = st.number_input("Dinheiro (R$)", step=10.0, value=None, key="dinheiro_input")
-        pix = st.number_input("Pix (R$)", step=10.0, value=None, key="pix_input")
+        pix = st.number_input("Pix (R$)", step=10.0, value=None, key="inheiro_input")
         uber = st.number_input("Uber (R$)", step=5.0, value=None, key="uber_input")
         t = st.session_state.get("total_input") or 0
         d = st.session_state.get("dinheiro_input") or 0
@@ -218,30 +240,3 @@ with tab1:
 
 with tab2:
     st.dataframe(df_mes, use_container_width=True)
-
-with tab3:
-    if not df_mes.empty:
-        colunas_grafico = ['Dinheiro', 'Pix', 'Uber', 'Próximo mês']
-        valores_grafico = totais[colunas_grafico]
-        
-        fig = px.pie(values=valores_grafico, names=colunas_grafico, title="Distribuição de Receitas",
-                     color=colunas_grafico, color_discrete_map=cores_map)
-        
-        # FORÇAR O TEXTO DENTRO E OTIMIZAR ESPAÇO
-        fig.update_traces(
-            textinfo='label+value+percent', 
-            texttemplate='%{label}<br>R$ %{value:,.2f}<br>(%{percent:.1%})',
-            insidetextorientation='radial', # Tenta alinhar o texto radialmente para caber melhor
-            insidetextfont=dict(size=11)    # Reduz levemente a fonte para garantir que caiba
-        )
-        
-        # Ajusta as margens para dar mais espaço ao gráfico e evita cortes
-        fig.update_layout(
-            template="plotly_white", 
-            margin=dict(t=50, b=50, l=20, r=20),
-            showlegend=False # Esconde a legenda lateral para ganhar espaço para a pizza
-        )
-        
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.info("Nenhum dado para exibir.")
