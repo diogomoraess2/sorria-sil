@@ -10,12 +10,12 @@ import streamlit.components.v1 as components
 # --- CONFIGURAÇÃO PWA ---
 manifest_json = """
 {
-  "name": "Easy Cash",
+  "name": "EasyCash",
   "short_name": "EasyCash",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#4a90e2",
+  "theme_color": "#9b34eb",
   "icons": [
     {
       "src": "https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/icon.png",
@@ -28,7 +28,7 @@ manifest_json = """
 b64_manifest = base64.b64encode(manifest_json.encode()).decode()
 
 st.set_page_config(
-    page_title="Controle Financeiro - Easy Cash",
+    page_title="Controle Financeiro - EasyCash",
     page_icon="https://raw.githubusercontent.com/diogomoraess2/sorria-sil/main/static/icon.png", 
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -49,7 +49,7 @@ st.markdown("""
     }
     
     /* Puxa todo o conteúdo para cima */
-    .block-container { margin-top: -75px !important; padding-top: 0rem !important; }
+    .block-container { margin-top: -60px !important; padding-top: 0rem !important; }
     
     /* Reduz o espaço logo abaixo do título principal */
     h1 { font-family: 'Segoe UI', sans-serif !important; margin-bottom: -10px !important; }
@@ -140,7 +140,7 @@ if 'mes_atual_num' not in st.session_state: st.session_state['mes_atual_num'] = 
 
 st.markdown("""
     <h1 style="text-align: center; width: 100%; display: block;">
-        <span style="color: #4a90e2;">Easy</span> <span style="color: #7ed321;">Cash</span>
+        <span style="color: #9b34eb;">Easy</span><span style="color: #eb34c3;">Cash</span>
     </h1>
 """, unsafe_allow_html=True)
 
