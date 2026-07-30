@@ -49,7 +49,7 @@ st.markdown("""
     }
     
     /* Puxa todo o conteúdo para cima */
-    .block-container { margin-top: -90px !important; padding-top: 0rem !important; }
+    .block-container { margin-top: -75px !important; padding-top: 0rem !important; }
     
     /* Reduz o espaço logo abaixo do título principal */
     h1 { font-family: 'Segoe UI', sans-serif !important; margin-bottom: -10px !important; }
