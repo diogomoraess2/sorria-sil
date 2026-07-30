@@ -89,6 +89,11 @@ st.markdown("""
     [data-baseweb="select"] span {
         color: #222222 !important;
     }
+
+    /* Adiciona espaço visual acima das abas */
+    .stTabs {
+        margin-top: 30px !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
