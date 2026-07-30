@@ -192,6 +192,8 @@ for i, (titulo, col) in enumerate(metricas):
             </div>''', unsafe_allow_html=True)
 
 
+
+
 # --- ABAS ---
 tab1, tab2, tab3 = st.tabs(["📝 Lançar", "📋 Dados", "📈 Gráficos"])
 
