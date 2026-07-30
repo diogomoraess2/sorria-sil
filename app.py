@@ -49,7 +49,7 @@ st.markdown("""
     }
     
     /* Puxa todo o conteúdo para cima usando margem negativa (padding não aceita valores negativos) */
-    .block-container { margin-top: -80px !important; padding-top: 0rem !important; }
+    .block-container { margin-top: -70px !important; padding-top: 0rem !important; }
     
     h1 { font-family: 'Segoe UI', sans-serif !important; margin-bottom: 20px !important; }
     
